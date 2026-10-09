@@ -370,35 +370,36 @@
   }
 
   function openStopModal() {
-    var s = DATA.stop;
-    if (!s) return;
-    var html = '<div class="modal-box">';
-    html += '<p style="font-size:12px;color:#8fb0c7;margin-bottom:8px">' + (s.mockNote || '') + '</p>';
-    html += '<div class="stop-stats" style="margin-bottom:12px">';
-    html += '<div class="kpi"><b>' + s.onlinePeople + '</b><span>在线人数</span></div>';
-    html += '<div class="kpi"><b>' + s.onlineDevices + '</b><span>在线设备</span></div></div>';
-    html += '<table class="tbl"><thead><tr><th>设备</th><th>在线</th><th>总量</th></tr></thead><tbody>';
-    (s.devices || []).forEach(function (d) {
-      html += '<tr><td>' + d.name + '</td><td>' + d.online + '</td><td>' + d.total + '</td></tr>';
-    });
-    html += '</tbody></table>';
-    html += '<p style="margin-top:12px"><a class="stop-link" href="' + s.url + '" target="_blank" rel="noopener">尝试打开远端 STOP：' + s.url + '</a></p>';
-    // iframe 兜底：远端常不可达，用 onerror/超时提示
-    html += '<div style="margin-top:10px;height:280px;border:1px solid rgba(0,231,255,.25);border-radius:8px;overflow:hidden;position:relative;background:#041228">';
-    html += '<iframe id="stopFrame" src="' + s.url + '" style="width:100%;height:100%;border:0;opacity:.85"></iframe>';
-    html += '<div id="stopFallback" style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;flex-direction:column;color:#8fb0c7;font-size:13px;padding:20px;text-align:center;background:rgba(4,18,40,.92)">';
-    html += '<div style="font-size:28px;margin-bottom:8px">📡</div>远端 STOP 不可达，已显示 mock 数据。<br>可点击上方链接在新窗口尝试打开。</div></div>';
-    html += '</div>';
-
+    var s = DATA.stop || {};
+    // 优先打开本地 stop.html（登录+API，无嵌套远端双滚动条）；远端地址仅作「新窗口」备用
+    var localUrl = s.localUrl || 'stop.html';
+    var remoteUrl = s.url || '';
     layer.open({
-      type: 1, title: Editable.get('modal_stop_title', 'STOP 系统'),
-      skin: 'dept-skin', area: ['820px', '85%'], shadeClose: true, content: html,
-      success: function () {
-        // 3 秒后若 iframe 仍跨域无法探测，展示兜底提示（演示友好）
-        setTimeout(function () {
-          var fb = document.getElementById('stopFallback');
-          if (fb) { fb.style.display = 'flex'; }
-        }, 2800);
+      type: 2,
+      title: Editable.get('modal_stop_title', 'STOP 监控预警'),
+      skin: 'dept-skin stop-skin',
+      area: ['94%', '92%'],
+      shadeClose: true,
+      // type:2 直接 iframe 本地页；外层 overflow:hidden，由 stop.html 内部侧栏/主区滚动
+      content: localUrl,
+      success: function (layero) {
+        // 强制内容区与 iframe 铺满，去掉 layer 默认内边距导致的二次滚动
+        var content = layero.find('.layui-layer-content');
+        content.css({ overflow: 'hidden', padding: 0 });
+        var iframe = layero.find('iframe');
+        iframe.css({ width: '100%', height: '100%', border: 0, display: 'block' });
+        // 标题栏旁可选：新窗口打开远端（若配置了 url）
+        if (remoteUrl && !layero.find('.stop-remote-link').length) {
+          var tip = document.createElement('a');
+          tip.className = 'stop-remote-link';
+          tip.href = remoteUrl;
+          tip.target = '_blank';
+          tip.rel = 'noopener';
+          tip.textContent = '远端原站';
+          tip.title = remoteUrl;
+          tip.style.cssText = 'position:absolute;right:46px;top:12px;font-size:12px;color:#8fb0c7;z-index:10;text-decoration:underline';
+          layero[0].appendChild(tip);
+        }
       }
     });
   }

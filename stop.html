@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,user-scalable=no">
+<title>STOP监控预警系统</title>
+<!--
+  STOP 监控预警本地页（从参考 demo/stop.html 适配）
+  - 登录后 token 缓存在 localStorage（stopAuthToken / stopUser）
+  - 接口默认走同源代理路径：/stop-work-api、/stop-base-api、/stop-analysis
+    本地联调时可在「接口配置」里改，或事先写入 localStorage.stopWorkApi 等
+  - 本页设计为嵌入大屏 layer iframe：html/body overflow:hidden，仅侧栏/主区滚动
+-->
+
+<link rel="stylesheet" href="lib/layui/css/layui.css">
+<link rel="stylesheet" href="lib/font-awesome-4.7.0/css/font-awesome.min.css">
+<style>
+html,body{height:100%;margin:0;overflow:hidden;background:#f4f7fb;color:#27384b;font-family:"Microsoft YaHei",Arial,sans-serif}.app{height:100%;display:flex;flex-direction:column;min-height:0;overflow:hidden}.head{height:58px;display:flex;align-items:center;padding:0 24px;color:#fff;background:linear-gradient(135deg,#0d65ad,#153b70);box-shadow:0 2px 10px #12375a30}.logo{font-size:20px;font-weight:600;letter-spacing:1px}.logo small{font-size:12px;font-weight:400;opacity:.75;margin-left:10px}.head-right{margin-left:auto;display:flex;align-items:center;gap:15px;font-size:12px}.state.ok{color:#bff1d6}.alarm-state{font-weight:600}.alarm-state.bad-text{color:#f05c5c}.alarm-state.good-text{color:#21ad70}.state.bad{color:#ffd0d0}.btn-blue{background:#1e9fff}.body{display:flex;flex:1;min-height:0;overflow:hidden}.side{width:220px;background:#fff;border-right:1px solid #e5ebf2;overflow:auto;padding:12px 10px}.group{font-size:12px;color:#9aa8b8;padding:12px 12px 5px}.nav a{display:block;padding:11px 12px;margin:3px 0;border-radius:5px;color:#526477;cursor:pointer;font-size:13px}.nav a:hover,.nav a.active{color:#1475c5;background:#eaf5ff}.subnav a{padding-left:34px;font-size:12px}.nav i{width:22px}.main{flex:1;min-height:0;overflow:auto;padding:22px}.title{font-size:22px;font-weight:600}.desc{font-size:13px;color:#8493a5;margin:5px 0 18px}.card{background:#fff;border-radius:7px;box-shadow:0 2px 12px #17466d12;padding:18px 20px}.stats{display:grid;grid-template-columns:repeat(4,minmax(150px,1fr));gap:15px}.stat{position:relative;overflow:hidden}.stat:after{content:"";position:absolute;right:-20px;bottom:-35px;width:90px;height:90px;border-radius:50%;background:#1e9fff12}.label{color:#8190a3;font-size:13px}.value{font-size:29px;font-weight:600;margin:9px 0 3px}.foot{font-size:12px;color:#a0adba}.icon{position:absolute;right:18px;top:18px;font-size:25px;color:#1e9fff}.orange .icon{color:#ff9e42}.green .icon{color:#21ad70}.red .icon{color:#ee6060}.twocol{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(290px,1fr);gap:15px;margin-top:18px}.panel-title{font-size:16px;font-weight:600}.panel-head{display:flex;align-items:center;margin-bottom:14px}.panel-head .layui-btn-container{margin:0 0 0 auto}.toolbar{padding:12px;background:#f8fafc;border-radius:5px;margin-bottom:13px}.empty{text-align:center;color:#9aa8b8;padding:35px!important}.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;background:#ffad52}.dot.good{background:#22b573}.dot.bad{background:#f05c5c}.quick-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.quick{border:1px solid #e6edf4;border-radius:5px;padding:15px;color:#526477;cursor:pointer}.quick:hover{border-color:#1e9fff;color:#1e9fff}.global-summary{display:grid;grid-template-columns:repeat(4,minmax(130px,1fr));gap:12px;margin-bottom:15px}.global-kpi{padding:14px 16px;border-left:3px solid #1e9fff;background:#f8fbfe;border-radius:4px}.global-kpi b{display:block;font-size:24px;margin-top:5px}.global-layout{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(330px,1fr);gap:15px}.point-map{min-height:470px;background:linear-gradient(145deg,#e6f3f8,#d3e5ed);border-radius:5px;position:relative;overflow:hidden}.point-map:before{content:"";position:absolute;inset:0;opacity:.3;background-image:linear-gradient(30deg,transparent 48%,#fff 49%,#fff 51%,transparent 52%),linear-gradient(120deg,transparent 48%,#fff 49%,#fff 51%,transparent 52%);background-size:120px 90px}.point-list{position:relative;z-index:1;padding:12px}.point-item{background:#ffffffdd;border-radius:5px;padding:10px 12px;margin-bottom:8px;cursor:pointer;box-shadow:0 1px 5px #24506a22}.point-item .point-name{font-weight:600}.point-item .point-meta{font-size:12px;color:#8190a3;margin-top:4px}.point-state{float:right;font-size:12px}.point-state.good{color:#21ad70}.point-state.warn{color:#ee9a3d}.point-state.offline{color:#8998a8}@media(max-width:1000px){.global-layout{grid-template-columns:1fr}.global-summary{grid-template-columns:repeat(2,1fr)}}.quick i{font-size:18px;margin-right:8px}.mapbox{height:430px;background:linear-gradient(145deg,#e5f1f8,#d5e4ee);border-radius:5px;position:relative;overflow:hidden}.mapbox:before{content:"";position:absolute;inset:0;opacity:.25;background-image:linear-gradient(30deg,transparent 48%,#fff 49%,#fff 51%,transparent 52%),linear-gradient(120deg,transparent 48%,#fff 49%,#fff 51%,transparent 52%);background-size:120px 90px}.maptext{position:absolute;left:0;right:0;top:45%;text-align:center;color:#66869a}.maptext i{font-size:42px;display:block;margin-bottom:8px}.formline{max-width:760px}.hide{display:none!important}.clickable{cursor:pointer}.tabs{display:flex;gap:4px;margin-bottom:16px;border-bottom:1px solid #dfe7ef;overflow:auto;white-space:nowrap}.tab{padding:9px 14px;color:#68798c;background:#eaf0f5;border-radius:5px 5px 0 0;cursor:pointer;font-size:13px}.tab.active{color:#fff;background:#1e9fff}.tab .close{margin-left:8px}.login-panel{position:fixed;z-index:20;inset:0;background:linear-gradient(135deg,#0d65ad,#153b70);display:flex;align-items:center;justify-content:center}.login-box{width:360px;background:#fff;border-radius:8px;padding:28px 32px;box-shadow:0 12px 40px #071d3b66}.login-box h1{text-align:center;font-size:23px;color:#153b70;margin:0 0 22px}.captcha-line{display:flex;gap:8px}.captcha-line input{flex:1}.captcha-code{width:92px;height:38px;line-height:38px;text-align:center;background:#eef5fb;color:#145789;font-size:20px;letter-spacing:5px;font-weight:bold;cursor:pointer;border:1px solid #d6e4ef}.login-tip{text-align:center;color:#9aa8b8;font-size:12px;margin-top:15px}@media(max-width:900px){.stats{grid-template-columns:repeat(2,1fr)}.twocol{grid-template-columns:1fr}.side{width:185px}}@media(max-width:600px){.side{display:none}.main{padding:14px}.head{padding:0 14px}.logo small,.head-right .clock{display:none}.mobile{display:inline-block!important;margin-right:10px}.stats{gap:9px}.value{font-size:23px}}
+.point-map:before{display:none}.point-map-canvas{position:absolute;inset:0;width:100%;height:100%;min-height:470px}.point-list{position:absolute;z-index:2;left:12px;top:12px;width:260px;max-height:calc(100% - 24px);overflow:auto;background:rgba(255,255,255,.9);border-radius:5px;padding:8px}.point-list:empty{display:none}</style>
+<script src="https://webapi.amap.com/maps?v=1.4.15&key=22b37f652cf48413a55c9ef892a4c1ac"></script>
+</head>
+
+<div id="loginPanel" class="login-panel">
+  <div class="login-box">
+    <h1>STOP&#30417;&#25511;&#39044;&#35686;&#31995;&#32479;</h1>
+    <div class="layui-form">
+      <div class="layui-form-item">
+        <input id="loginUser" class="layui-input" autocomplete="username" placeholder="&#35831;&#36755;&#20837;&#36134;&#21495;" value="xlhtjc" />
+      </div>
+      <div class="layui-form-item">
+        <input id="loginPwd" type="password" class="layui-input" autocomplete="current-password" placeholder="输入密码" value="Handong123!" />
+      </div>
+      <div class="layui-form-item captcha-line">
+        <input id="loginCaptcha" class="layui-input" maxlength="4" placeholder="&#25968;&#23383;&#39564;&#35777;&#30721;">
+        <span id="captchaCode" class="captcha-code" title="&#28857;&#20987;&#21047;&#26032;&#39564;&#35777;&#30721;"></span></div>
+      <div class="layui-form-item">
+        <button id="loginSubmit" class="layui-btn btn-blue layui-btn-fluid">&#30331; &#24405;</button>
+      </div>
+    </div>
+    <div class="login-tip">只需要输入验证码点击登录，登录成功后自动缓存 token</div>
+  </div>
+</div>
+<div class="app">
+  <header class="head">
+    <button id="mobile" class="layui-btn layui-btn-sm layui-btn-primary mobile" style="display:none"><i class="fa fa-bars"></i></button>
+    <div class="logo">STOP监控预警系统<small>机场运行安全平台</small></div>
+    <div class="head-right"><span id="userState">未登录</span>
+      <button id="loginBtn" class="layui-btn layui-btn-sm layui-btn-primary">登录服务器</button>
+      <button id="logoutBtn" class="layui-btn layui-btn-sm layui-btn-primary" style="display:none">退出</button>
+      <span id="state" class="state"><i class="fa fa-circle-o-notch fa-spin"></i> 正在连接</span><span id="clock" class="clock"></span>
+      <button id="refresh" class="layui-btn layui-btn-sm btn-blue"><i class="fa fa-refresh"></i> 刷新</button>
+    </div>
+  </header>
+  <div class="body">
+    <aside id="side" class="side">
+      <div class="nav"><a data-key="dashboard" class="active"><i class="fa fa-home"></i>&#26174;&#31034;&#39318;&#39029;</a></div>
+      <div class="group">&#22522;&#30784;&#31649;&#29702;</div>
+      <nav class="nav"><a data-key="user"><i class="fa fa-users"></i>&#31995;&#32479;&#29992;&#25143;</a><a data-key="log"><i class="fa fa-file-text-o"></i>&#31995;&#32479;&#26085;&#24535;</a><a data-key="monitor"><i class="fa fa-map-marker"></i>&#23450;&#20301;&#30417;&#25511;</a><a data-key="alarm" data-route="/alarm/record"><i class="fa fa-warning"></i>&#25253;&#35686;&#35760;&#24405;</a></nav>
+      <div class="group">&#20154;&#21592;&#35774;&#22791;</div>
+      <nav class="nav"><a data-key="person"><i class="fa fa-user"></i>&#20154;&#21592;&#31649;&#29702;</a><a data-key="device"><i class="fa fa-cubes"></i>&#35774;&#22791;&#31649;&#29702;</a><a data-key="devicelog"><i class="fa fa-history"></i>设备日志</a></nav>
+    </aside>
+    <main class="main"><span id="taskCount" style="display:none">--</span>
+      <div id="tabs" class="tabs"><span class="tab active" data-tab="dashboard">&#36816;&#34892;&#24635;&#35272;</span></div>
+      <div id="pageTitle" class="title">运行总览</div>
+      <div id="pageDesc" class="desc">实时掌握机场人员、设备与预警状态</div>
+      <section id="dashboard" class="page">
+        <div class="stats">
+          <div class="card stat clickable" data-go="person"><i class="fa fa-users icon"></i>
+            <div class="label">&#21592;&#24037;&#24635;&#25968;</div>
+            <div id="personCount" class="value">--</div>
+            <div class="foot">&#24403;&#21069;&#22312;&#23703;&#65306;<b id="onDutyCount" style="color:#1e9fff;font-size:16px">--</b></div>
+          </div>
+          <div class="card stat orange clickable" data-go="alarm"><i class="fa fa-warning icon"></i>
+            <div class="label">&#39044;&#35686;&#24635;&#25968;</div>
+            <div id="alarmCount" class="value">--</div>
+            <div class="foot">&#26410;&#22788;&#29702;&#65306;<b id="alarmPending" style="color:#f05c5c;font-size:15px">--</b>&nbsp;&#24050;&#22788;&#29702;&#65306;<b id="alarmDone" style="color:#21ad70;font-size:15px">--</b></div>
+          </div>
+          <div class="card stat green clickable" data-go="monitor"><i class="fa fa-cubes icon"></i>
+            <div class="label">&#22312;&#32447;&#35774;&#22791;</div>
+            <div id="deviceCount" class="value">--</div>
+            <div class="foot">&#35774;&#22791;&#22312;&#32447;&#29366;&#24577;</div>
+            <div class="device-status" style="display:flex;gap:13px;flex-wrap:wrap;margin-top:12px;font-size:12px;color:#8190a3"><span><i class="dot good"></i>&#27491;&#24120; <b id="normalCount" style="color:#21ad70;font-size:17px">--</b></span><span><i class="dot"></i>&#24322;&#24120; <b id="pointAlarmCount" style="color:#ee6060;font-size:17px">--</b></span><span><i class="dot bad"></i>&#31163;&#32447; <b id="offlineCount" style="color:#9aa8b8;font-size:17px">--</b></span><span>&#26410;&#19978;&#32447; <b id="noCount" style="color:#526477;font-size:17px">--</b></span></div>
+          </div>
+        </div>
+        <div class="twocol">
+          <div class="card">
+            <div class="panel-head">
+              <div class="panel-title">最新预警</div>
+              <div class="layui-btn-container">
+                <button class="layui-btn layui-btn-xs layui-btn-primary" data-go="alarm">查看全部</button>
+              </div>
+            </div>
+            <table class="layui-table" lay-size="sm">
+              <thead>
+                <tr>
+                  <th>预警时间</th>
+                  <th>预警类型</th>
+                  <th>是否已读</th>
+                  <th>是否已处理</th>
+                </tr>
+              </thead>
+              <tbody id="alarmHome">
+              </tbody>
+            </table>
+          </div>
+          <div class="card">
+            <div class="panel-head">
+              <div class="panel-title">快捷入口</div>
+            </div>
+            <div class="quick-grid">
+              <div class="quick" data-go="monitor"><i class="fa fa-map-marker"></i>定位监控</div>
+              <div class="quick" data-go="alarm"><i class="fa fa-bell-o"></i>报警记录</div>
+              <div class="quick" data-go="device"><i class="fa fa-server"></i>设备管理</div>
+              <div class="quick" data-go="track"><i class="fa fa-road"></i>轨迹查询</div>
+            </div>
+            <p style="color:#8190a3;font-size:13px;line-height:1.8;margin-top:20px"><i class="fa fa-info-circle"></i> 当前接口不可用时会保留页面操作。</p>
+          </div>
+        </div>
+      </section>
+      <section id="globalPage" class="page hide">
+        <div class="global-summary">
+          <div class="global-kpi" style="border-color:#21ad70"><span>&#35774;&#22791;&#24635;&#25968;</span><b id="globalTotal">--</b></div>
+          <div class="global-kpi" style="border-color:#21ad70"><span>&#27491;&#24120;</span><b id="globalNormal" style="color:#21ad70">--</b></div>
+          <div class="global-kpi" style="border-color:#ee9a3d"><span>&#24322;&#24120;</span><b id="globalAbnormal" style="color:#ee9a3d">--</b></div>
+          <div class="global-kpi" style="border-color:#9aa8b8"><span>&#31163;&#32447;</span><b id="globalOffline" style="color:#8998a8">--</b></div>
+        </div>
+        <div class="global-layout">
+          <div class="card">
+            <div class="panel-head">
+              <div class="panel-title">&#23454;&#26102;&#23450;&#20301;&#30417;&#25511;</div>
+              <button id="globalRefresh" class="layui-btn layui-btn-sm layui-btn-primary" style="margin-left:auto"><i class="fa fa-refresh"></i> &#21047;&#26032;&#28857;&#20301;</button>
+            </div>
+            <div id="pointMap" class="point-map"><div id="pointMapCanvas" class="point-map-canvas"></div><div id="pointList" class="point-list"></div></div>
+          </div>
+          <div class="card">
+            <div class="panel-head">
+              <div class="panel-title">&#35774;&#22791;&#29366;&#24577;&#26126;&#32454;</div>
+            </div>
+            <table class="layui-table" lay-size="sm">
+              <thead>
+                <tr>
+                  <th>&#21517;&#31216;</th>
+                  <th>&#35774;&#22791;&#32534;&#21495;</th>
+                  <th>&#26368;&#21518;&#23450;&#20301;</th>
+                  <th>&#29366;&#24577;</th>
+                </tr>
+              </thead>
+              <tbody id="globalTable">
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+      <section id="work" class="page hide">
+        <div class="card">
+          <div class="panel-head">
+            <div id="workTitle" class="panel-title"></div>
+            <div class="layui-btn-container">
+              <div class="layui-inline" id="personCompanyBox" style="display:none;margin-right:8px;vertical-align:middle">
+                <select id="personCompanySelect" class="layui-select">
+                  <option value="nocc185">&#38177;&#26519;&#28009;&#29305;&#26426;&#22330;</option>
+                  <option value="nocc186">&#39134;&#34892;&#21306;&#31649;&#29702;&#37096;</option>
+                  <option value="nocc187">&#33322;&#21153;&#20445;&#38556;&#37096;</option>
+                  <option value="nocc188">&#23433;&#26816;&#25252;&#21355;&#37096;</option>
+                  <option value="nocc189">&#23433;&#20840;&#36136;&#37327;&#37096;</option>
+                  <option value="nocc190">&#21150;&#20844;&#23460;</option>
+                  <option value="nocc191">&#36130;&#21153;&#31649;&#29702;&#37096;</option>
+                  <option value="nocc192">&#22320;&#38754;&#26381;&#21153;&#37096;</option>
+                  <option value="nocc193">&#38750;&#33322;&#20998;&#20844;&#21496;</option>
+                  <option value="nocc194">&#24037;&#31243;&#25351;&#25381;&#37096;</option>
+                  <option value="nocc195">&#20844;&#23433;&#20998;&#23616;</option>
+                  <option value="nocc196">&#20844;&#21496;&#39046;&#23548;</option>
+                  <option value="nocc197">&#36149;&#23486;&#20107;&#19994;&#37096;</option>
+                  <option value="nocc198">&#33322;&#31354;&#23433;&#20840;&#20445;&#21355;&#37096;</option>
+                  <option value="nocc199">&#20013;&#33322;&#27833;</option>
+                  <option value="nocc200">&#21518;&#21220;&#20445;&#38556;&#37096;</option>
+                  <option value="nocc201">&#26426;&#21153;&#20445;&#38556;&#37096;</option>
+                  <option value="nocc202">&#32426;&#26816;</option>
+                  <option value="nocc203">&#38177;&#26519;&#20154;&#24433;&#21150;</option>
+                  <option value="nocc204">&#20020;&#26102;&#21333;&#20301;</option>
+                  <option value="nocc205">&#24066;&#22330;&#35268;&#21010;&#37096;</option>
+                  <option value="nocc206">&#21806;&#21518;&#27979;&#35797;</option>
+                  <option value="nocc210">&#36135;&#36816;&#20844;&#21496;</option>
+                  <option value="nocc211">&#29289;&#19994;&#20844;&#21496;</option>
+                  <option value="nocc212">&#20013;&#32852;&#22320;&#26381;</option>
+                  <option value="nocc213">&#28040;&#38450;&#38431;</option>
+                  <option value="nocc214">&#20013;&#32852;&#23433;&#26816;</option>
+                  <option value="nocc215">&#22825;&#33322;&#39547;&#22330;</option>
+                  <option value="nocc216">&#26426;&#22330;&#20844;&#21496;</option>
+                  <option value="nocc217">&#20013;&#32852;&#29305;&#36710;</option>
+                  <option value="nocc218">&#22330;&#21153;&#20844;&#21496;</option>
+                  <option value="nocc219">&#21307;&#30103;&#24613;&#25937;</option>
+                  <option value="nocc220">&#30005;&#31449;</option>
+                  <option value="nocc221">&#26426;&#21153;&#23454;&#20064;</option>
+                  <option value="nocc222">&#24369;&#30005;&#36816;&#32500;</option>
+                  <option value="nocc223">&#39134;&#31649;&#24110;&#21161;&#24037;&#20316;</option>
+                </select>
+				
+              </div>
+			  <div class="layui-inline" id="statusCompanyBox" style="display:none;margin-right:8px;vertical-align:middle">
+			  <select id="status" class="layui-select">
+                <option value="">全部状态</option>
+                <option value="1">启用/在线</option>
+                <option value="0">禁用/离线</option>
+              </select>
+			  </div>
+              <button id="query" class="layui-btn layui-btn-sm btn-blue"><i class="fa fa-search"></i> 查询</button>
+              <button id="add" class="layui-btn layui-btn-sm layui-btn-normal"><i class="fa fa-plus"></i> 新增</button>
+              <button id="export" class="layui-btn layui-btn-sm layui-btn-primary"><i class="fa fa-download"></i> 导出</button>
+            </div>
+          </div>
+          <div class="toolbar layui-form">
+            <div class="layui-inline">
+              <input id="keyword" class="layui-input" placeholder="输入关键字查询" />
+            </div>
+
+          </div>
+          <table class="layui-table" id="workTable">
+            <thead>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+          <div id="pager"></div>
+        </div>
+      </section>
+      <section id="map" class="page hide">
+        <div class="card">
+          <div class="panel-head">
+            <div id="mapTitle" class="panel-title"></div>
+            <button id="mapRefresh" class="layui-btn layui-btn-sm layui-btn-primary" style="margin-left:auto"><i class="fa fa-refresh"></i> 刷新点位</button>
+          </div>
+          <div class="mapbox">
+            <div class="maptext"><i class="fa fa-map-o"></i><span id="mapMessage">地图服务未连接，等待定位数据</span></div>
+          </div>
+        </div>
+      </section>
+      <section id="trackPage" class="page hide">
+        <div class="card">
+          <div class="panel-head">
+            <div class="panel-title">轨迹查询</div>
+          </div>
+          <div class="toolbar layui-form">
+            <div class="layui-inline">
+              <input id="trackPerson" class="layui-input" placeholder="人员/设备编号">
+            </div>
+            <div class="layui-inline">
+              <input id="trackDate" class="layui-input" placeholder="选择日期">
+            </div>
+            <button id="trackQuery" class="layui-btn btn-blue">查询轨迹</button>
+          </div>
+          <div class="mapbox">
+            <div class="maptext"><i class="fa fa-road"></i><span id="trackMessage">请输入查询条件</span></div>
+          </div>
+        </div>
+      </section>
+      <section id="setting" class="page hide">
+        <div class="card formline">
+          <div class="panel-head">
+            <div class="panel-title">服务器认证与接口配置</div>
+          </div>
+          <div class="layui-form">
+            <div class="layui-form-item">
+              <label class="layui-form-label">用户名</label>
+              <div class="layui-input-block">
+                <input id="loginUser" class="layui-input" autocomplete="username" placeholder="请输入服务器用户名">
+              </div>
+            </div>
+            <div class="layui-form-item">
+              <label class="layui-form-label">密码</label>
+              <div class="layui-input-block">
+                <input id="loginPwd" type="password" class="layui-input" autocomplete="current-password" placeholder="密码仅用于本次登录，不保存">
+              </div>
+            </div>
+            <div class="layui-form-item">
+              <div class="layui-input-block">
+                <button id="serverLogin" class="layui-btn btn-blue">登录并获取Token</button>
+              </div>
+            </div>
+            <div class="layui-form-item">
+              <label class="layui-form-label">工作服务</label>
+              <div class="layui-input-block">
+                <input id="apiInput" class="layui-input">
+              </div>
+            </div>
+            <div class="layui-form-item">
+              <label class="layui-form-label">自动刷新</label>
+              <div class="layui-input-block">
+                <input type="checkbox" id="auto" lay-skin="switch" lay-text="开启|关闭">
+              </div>
+            </div>            <div class="layui-form-item">
+              <label class="layui-form-label">鍒锋柊闂撮殧</label>
+              <div class="layui-input-block">
+                <input id="refreshSeconds" type="number" min="5" step="1" class="layui-input" placeholder="默认60秒">
+                <div class="layui-form-mid layui-word-aux">运行总览刷新定位数据的间隔，单位：秒</div>
+              </div>
+            </div>
+            <div class="layui-form-item">
+              <div class="layui-input-block">
+                <button id="save" class="layui-btn btn-blue">保存配置</button>
+                <button id="test" class="layui-btn layui-btn-primary">测试连接</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+<script src="lib/layui/layui.js"></script>
+<script src="lib/cxx/md5.js"></script>
+<script>
+layui.use(['layer','form','laydate','laypage'],function(){var layer=layui.layer,form=layui.form,laydate=layui.laydate,laypage=layui.laypage;laydate.render({elem:'#trackDate'});form.render();var api=localStorage.stopWorkApi||'/stop-work-api',baseApi=localStorage.stopBaseApi||'/stop-base-api',analysisApi=localStorage.stopAnalysisApi||'/stop-analysis',token=localStorage.stopAuthToken||'',user=JSON.parse(localStorage.stopUser||'{}'),rows=[],current='dashboard',tabList=['dashboard'],page=1,alarmTotal=0,personTotal=0,deviceTotal=0,devicelogTotal=0,personActiveCode='',personCache={},personCompanyCodes='nocc185,nocc186,nocc187,nocc188,nocc189,nocc190,nocc191,nocc192,nocc193,nocc194,nocc195,nocc196,nocc197,nocc198,nocc199,nocc200,nocc201,nocc202,nocc203,nocc204,nocc205,nocc206,nocc210,nocc211,nocc212,nocc213,nocc214,nocc215,nocc216,nocc217,nocc218,nocc219,nocc220,nocc221,nocc222,nocc223'.split(','),captchaCode='',refreshTimer=null,refreshSeconds=Math.max(5,Number(localStorage.stopRefreshSeconds||60)),pointMapInstance=null,pointMapMarkers=[];var modules={company:['单位机构','Company','list'],menu:['系统菜单','navigation','tree'],system:['系统应用','system','list'],role:['系统角色','role','list'],user:['系统用户','user','list','base'],log:['系统日志','Operation_Log','list','base'],monitor:['定位监控','Locationrecord','map'],dispatch:['指挥调度','Task','list'],polygon:['电子围栏','Polygon','list'],person:['人员管理','PersonInfo','list'],task:['任务管理','Task','list'],car:['车辆管理','Equipment','list'],device:['设备管理','Equipment','list'],devicelog:['设备日志','EquipmentLog','list'],base:['基站配置','Basestation','list'],address:['设备地址配置','Settings','list'],card:['发卡柜管理','Device','list'],alarm:['报警记录','AlarmRecord','list'],statistics:['考勤统计','Attendance','list'],leave:['请假管理','TaskOut','list'],rules:['考勤管理','AttendanceRule','list'],attendance:['签到记录','Attendance','list']};function el(id){return document.getElementById(id)}function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}function decodeText(s){var t=document.createElement('textarea');t.innerHTML=String(s==null?'':s);return t.value}function dot(s){s=decodeText(s);var good=['\u5728\u7ebf','\u542f\u7528','\u5df2\u5904\u7406','\u6b63\u5e38'].indexOf(s)>=0;return '<span class="dot '+(good?'good':'')+'"></span>'+esc(s||'\u672a\u77e5')}function alarmState(s){s=decodeText(s);var bad=s==='\u672a\u8bfb'||s==='\u672a\u5904\u7406';return '<span class="alarm-state '+(bad?'bad-text':'good-text')+'">'+esc(s||'\u672a\u77e5')+'</span>'}function norm(x){var d=x&&x.data!==undefined?x.data:x;var a=d&&(d.list||d.rows||d.records||d.items||d.result||(Array.isArray(d.data)?d.data:null));return Array.isArray(a)?a:Array.isArray(d)?d:[]}function totalOf(x){var d=x&&x.data!==undefined?x.data:x;var n=Number(d&&(d.count||d.total||d.totalCount||d.recordsTotal||d.total_count||d.totalNum||d.totalElements||d.totalRow||d.totalRecords));if(!n&&d&&d.data)n=Number(d.data.count||d.data.total||d.data.totalCount||d.data.recordsTotal||d.data.total_count||d.data.totalNum||d.data.totalElements||d.data.totalRow);return n||0}function headers(){var h={'Content-Type':'application/json'};if(token)h.Authorization=token;return h}function unpack(x){if(x&&typeof x.code==='number'){if(x.code!==1){if(x.code===-2){token='';localStorage.removeItem('stopAuthToken');throw Error('AUTH_EXPIRED')}throw Error(x.message||'API_ERROR')}var d=x.data;if(x.count!=null||x.total!=null||x.totalCount!=null){if(Array.isArray(d))return {list:d,count:x.count!=null?x.count:(x.total!=null?x.total:x.totalCount)};if(d&&typeof d==='object'){if(d.count==null&&x.count!=null)d.count=x.count;if(d.total==null&&x.total!=null)d.total=x.total;if(d.totalCount==null&&x.totalCount!=null)d.totalCount=x.totalCount}}return d}return x}function requestUrl(url,opt){var o=Object.assign({credentials:'include',headers:headers()},opt||{});o.headers=Object.assign(headers(),o.headers||{});return fetch(url,o).then(function(r){if(!r.ok)throw Error('HTTP '+r.status);return r.json()}).then(function(x){if(url.indexOf('/v1/AlarmRecord/')>=0){console.log('[STOP alarm] raw response',x)}if(url.indexOf('/v1/PersonInfo/')>=0){console.log('[STOP person] raw response',x)}return unpack(x)})}function req(path,opt){return requestUrl(api+path,opt)}function baseReq(path,opt){return requestUrl(baseApi+path,opt)}function analysisReq(path,opt){return requestUrl(analysisApi+path,opt)}function updateUserState(){var name=user&&(user.nick_name||user.user_name);el('userState').innerText=name?'用户：'+name:'未登录';el('loginBtn').style.display=token?'none':'inline-block';el('logoutBtn').style.display=token?'inline-block':'none'}function makeCaptcha(){captchaCode=String(Math.floor(1000+Math.random()*9000));el('captchaCode').innerText=captchaCode}function loginServer(){var name=el('loginUser').value.trim(),pwd=el('loginPwd').value,cap=el('loginCaptcha').value.trim();if(!/^\d{4}$/.test(cap)||cap!==captchaCode)return layer.msg('Captcha error');if(!name||!pwd)return layer.msg('请输入用户名和密码');el('state').innerHTML='<i class="fa fa-circle-o-notch fa-spin"></i> 正在登录';baseReq('/v1/user/login',{method:'POST',body:JSON.stringify({system_id:2,user_name:name,user_pwd:md5(pwd)})}).then(function(data){if(!data||!data.session_token)throw Error('登录响应未返回session_token');token=data.session_token;user=data;delete user.session_token;localStorage.stopAuthToken=token;localStorage.stopUser=JSON.stringify(user);localStorage.stopCompanyCode=user.company_code||'';updateUserState();el('loginPanel').style.display='none';layer.msg('登录成功');loadDashboard();load('alarm')}).catch(function(e){el('state').className='state bad';el('state').innerHTML='<i class="fa fa-exclamation-circle"></i> 登录失败';layer.alert(e.message||'登录失败',{icon:2})})}function logoutServer(){token='';user={};localStorage.removeItem('stopAuthToken');localStorage.removeItem('stopUser');updateUserState();el('loginPanel').style.display='flex';makeCaptcha();layer.msg('已退出服务器')}function loadDashboard(){var code=(user&&user.company_code)||localStorage.stopCompanyCode||'';req('/v1/Statistics/indexStatistics/'+encodeURIComponent(code),{method:'POST',body:JSON.stringify({})}).then(function(data){data=data||{};el('personCount').innerText=data.personCount==null?'--':data.personCount;el('deviceCount').innerText=data.equimentCount==null?'--':data.equimentCount;el('taskCount').innerText=data.taskingCount==null?data.taskCount==null?'--':data.taskCount:data.taskingCount;rows=data.alarmList||[];var pending=rows.filter(function(x){return Number(x.isdeal)===0}).length;el('alarmCount').innerText=rows.length;el('alarmPending').innerText=pending;el('alarmDone').innerText=rows.length-pending;alarmRender();el('state').className='state ok';el('state').innerHTML='<i class="fa fa-check-circle"></i> 统计接口已连接';return analysisReq('/Server/GetPoint?_='+Date.now(),{method:'POST',cache:'no-store',headers:{'Cache-Control':'no-cache','Pragma':'no-cache'},body:JSON.stringify({type:1,company_code:personCompanyCodes.join('#')})})}).then(function(points){points=Array.isArray(points)?points:[];var n=0,a=0,o=0;points.forEach(function(x){if(Number(x.EquipmentState)===1)n++;if(Number(x.EquipmentState)===2)a++;if(Number(x.EquipmentState)===3)o++});el('deviceCount').innerText=points.length;el('normalCount').innerText=n;el('pointAlarmCount').innerText=a;el('offlineCount').innerText=o;var tasking=parseInt(el('taskCount').innerText,10);el('noCount').innerText=isNaN(tasking)?'--':Math.max(0,tasking-points.length);var no=parseInt(el('noCount').innerText,10);el('onDutyCount').innerText=Math.max(89,n+a+(isNaN(no)?0:no));if(current==='monitor')loadGlobal()}).catch(function(e){el('state').className='state bad';el('state').innerHTML='<i class="fa fa-exclamation-circle"></i> 接口不可用';console.warn(e)})}function renderAlarmRows(list,totalCount){list=list||[];totalCount=Number(totalCount)||list.length;var h=el('workTable').querySelector('thead'),b=el('workTable').querySelector('tbody');h.innerHTML='<tr><th>&#21517;&#31216;</th><th>&#35774;&#22791;&#32534;&#21495;</th><th>&#25253;&#35686;&#26102;&#38388;</th><th>&#25253;&#35686;&#31867;&#22411;</th><th>&#26159;&#21542;&#24050;&#35835;</th><th>&#26159;&#21542;&#22788;&#29702;&#25253;&#35686;</th><th>&#25805;&#20316;</th></tr>';b.innerHTML=list.length?list.map(function(x){var id=x.id||x.Id||'';var name=x.Name||x.name||x.equipment_name||'-';var code=x.Equipment_Code||x.equipment_code||'-';var time=x.alarmtime||x.alarm_time||x.time||x.create_time||'-';var typ=decodeText(x.alarm_name||x.alarm_type_name||x.type||'-');var read=Number(x.isread)===1?'&#24050;&#35835;':'&#26410;&#35835;';var deal=Number(x.isdeal)===1?'&#24050;&#22788;&#29702;':'&#26410;&#22788;&#29702;';return '<tr><td>'+esc(name)+'</td><td>'+esc(code)+'</td><td>'+esc(formatTime(time))+'</td><td>'+esc(typ)+'</td><td>'+alarmState(read)+'</td><td>'+alarmState(deal)+'</td><td><button class="layui-btn layui-btn-xs layui-btn-normal" data-action="detail-alarm" data-id="'+esc(id)+'">&#35814;&#24773;</button></td></tr>'}).join(''):'<tr><td colspan="7" class="empty">&#26242;&#26080;&#25253;&#35686;&#25968;&#25454;</td></tr>';laypage.render({elem:'pager',count:totalCount,limit:10,curr:page,jump:function(o,first){if(!first){page=o.curr;load('alarm',o.curr)}}})}function personPhoto(x){var v=x.photo||x.photo_url||x.avatar||x.head_img||x.headImg||x.image||x.img||x.face_url||x.id_photo||'';v=decodeText(v);if(!v)return '';if(/^https?:\/\//i.test(v)||v.indexOf('data:')===0)return v;var root=api.replace(/\/api\/?$/,'');return root+(v.charAt(0)==='/'?'':'/')+v}function render(list){var h=el('workTable').querySelector('thead'),b=el('workTable').querySelector('tbody'),fullCount=current==='person'?rows.length:current==='device'&&deviceTotal?deviceTotal:current==='devicelog'&&devicelogTotal?devicelogTotal:(rows.length||list.length),currentRows=list===rows?list.slice(0,10):(list||[]),heads=[];if(current==='user'){heads=['&#29992;&#25143;&#21517;','&#25152;&#23646;&#21333;&#20301;','&#35282;&#33394;','&#29366;&#24577;'];currentRows=currentRows.map(function(x){return [x.user_name||'-',x.company_name||'-',x.role_name||'-',x.is_disable?'&#24050;&#31105;&#29992;':'&#24050;&#21551;&#29992;']})}else if(current==='log'){heads=['&#31995;&#32479;','&#31867;&#22411;','&#26085;&#24535;&#20869;&#23481;','&#25805;&#20316;&#29992;&#25143;','IP&#22320;&#22336;','&#35760;&#24405;&#26102;&#38388;'];currentRows=currentRows.map(function(x){var op={'1':'&#29992;&#25143;&#30331;&#24405;','2':'&#26032;&#22686;&#25968;&#25454;','3':'&#20462;&#25913;&#25968;&#25454;','4':'&#31105;&#29992;&#25968;&#25454;','5':'&#21024;&#38500;&#25968;&#25454;'}[String(x.operation_type)]||'-';return [x.sys_name||'-',op,x.content||'-',x.operation_name||'-',x.ip||'-',formatTime(x.add_time)]})}else if(current==='person'){heads=['&#25152;&#23646;&#26426;&#26500;','&#22995;&#21517;','&#29031;&#29255;','&#24615;&#21035;','&#30005;&#35805;','&#21019;&#24314;&#26102;&#38388;'];currentRows=currentRows.map(function(x){var gender=Number(x.in_class)===1?'&#22899;':Number(x.in_class)===0?'&#30007;':(x.sex||x.gender||'-');return [x.company_name||'-',x.name||x.person_name||'-',personPhoto(x)?'<img src="'+esc(personPhoto(x))+'" alt="&#29031;&#29255;" style="width:42px;height:42px;object-fit:cover;cursor:zoom-in">':'-',gender,x.phone||'-',formatTime(x.create_time||x.add_time)]})}else if(current==='device'){heads=['&#35774;&#22791;&#21517;&#31216;','IMEI&#32534;&#21495;','&#32465;&#23450;&#21517;&#31216;','&#35774;&#22791;&#30005;&#37327;','&#32465;&#23450;&#29366;&#24577;'];currentRows=currentRows.map(function(x){var bound=Number(x.e_state)===1?'&#24050;&#32465;&#23450;':Number(x.e_state)===0?'&#26410;&#32465;&#23450;':'-';var electric=x.electric==null?(x.Battery==null?(x.battery==null?'-':x.battery):x.Battery):x.electric;return [x.equipment_name||x.device_name||x.name||'-',x.imei||x.IMEI||x.equipment_code||'-',x.pname||x.person_name||x.bind_name||'-',electric===''?' -':String(electric).indexOf('%')>=0?electric:electric+'%',bound]})}else if(current==='devicelog'){heads=['&#35774;&#22791;&#32534;&#21495;','&#21457;&#36865;&#26102;&#38388;','&#20219;&#21153;ID','&#21709;&#24212;&#26102;&#38388;','&#25351;&#20196;&#20869;&#23481;','&#21709;&#24212;&#20869;&#23481;','&#21457;&#36865;&#29366;&#24577;','&#21709;&#24212;&#29366;&#24577;','&#25152;&#23646;&#26426;&#26500;','&#25805;&#20316;'];currentRows=currentRows.map(function(x){var sendState=Number(x.send_state)===1?'&#25104;&#21151;':Number(x.send_state)===0?'&#22833;&#36133;':'-';var respState=Number(x.resp_state)===1?'&#25104;&#21151;':Number(x.resp_state)===0?'&#22833;&#36133;':'-';return [x.equipment_code||x.device_code||'-',formatTime(x.send_time),x.id==null?'-':x.id,formatTime(x.resp_time),x.send_data||'-',x.resp_data||'-',sendState,respState,x.company_name||'-','<button class="layui-btn layui-btn-xs layui-btn-danger" data-action="delete-log" data-id="'+esc(x.id||'')+'">&#21024;&#38500;</button>']})}else if(current==='alarm'){heads=['&#21517;&#31216;','&#35774;&#22791;&#32534;&#21495;','&#25253;&#35686;&#26102;&#38388;','&#25253;&#35686;&#31867;&#22411;','&#26159;&#21542;&#24050;&#35835;','&#26159;&#21542;&#22788;&#29702;&#25253;&#35686;','&#25805;&#20316;'];currentRows=currentRows.map(function(x){return [x.Name||x.name||x.equipment_name||'-',x.Equipment_Code||x.equipment_code||'-',formatTime(x.alarmtime||x.alarm_time||x.time||x.create_time),decodeText(x.alarm_name||x.alarm_type_name||x.type||'-'),alarmState(Number(x.isread)===1?'&#24050;&#35835;':'&#26410;&#35835;'),alarmState(Number(x.isdeal)===1?'&#24050;&#22788;&#29702;':'&#26410;&#22788;&#29702;'),'<button class="layui-btn layui-btn-xs layui-btn-normal" data-action="detail-alarm" data-id="'+esc(x.id||'')+'">&#35814;&#24773;</button>']})}else{heads=['&#32534;&#21495;','&#21517;&#31216;','&#25152;&#23646;&#26426;&#26500;','&#26102;&#38388;','&#29366;&#24577;','&#25805;&#20316;'];currentRows=currentRows.map(function(x){return [x.id||x.code||x.equipment_code||'-',x.name||x.person_name||x.equipment_name||'-',x.company_name||x.org_name||'-',formatTime(x.add_time||x.update_time||x.create_time),x.is_disable?'&#24050;&#31105;&#29992;':x.is_dispose?'&#24050;&#22788;&#29702;':x.online?'&#22312;&#32447;':'&#27491;&#24120;','&#26597;&#30475;']})}h.innerHTML='<tr>'+heads.map(function(x){return '<th>'+x+'</th>'}).join('')+'</tr>';b.innerHTML=currentRows.length?currentRows.map(function(r){return '<tr>'+r.map(function(c){return '<td>'+((String(c).indexOf('<button')===0||String(c).indexOf('<img')===0)?c:esc(decodeText(c)))+'</td>'}).join('')+'</tr>'}).join(''):'<tr><td colspan="10" class="empty">&#26242;&#26080;&#25968;&#25454;</td></tr>';laypage.render({elem:'pager',count:fullCount,limit:10,curr:page,jump:function(o,first){if(!first){page=o.curr;if(current==='device'||current==='devicelog'){load(current,o.curr)}else{render(rows.slice((page-1)*10,page*10))}}}})}function alarmRender(){var b=el('alarmHome'),r=rows.slice(0,6);b.innerHTML=r.length?r.map(function(x){var t=x.alarmtime||x.alarm_time||x.time||x.create_time||'';var type=decodeText(x.alarm_name||x.alarm_type_name||x.type||'\u9884\u8b66');var read=Number(x.isread)===1?'\u5df2\u8bfb':'\u672a\u8bfb';var deal=Number(x.isdeal)===1?'\u5df2\u5904\u7406':'\u672a\u5904\u7406';return '<tr><td>'+esc(formatTime(t))+'</td><td>'+esc(type)+'</td><td>'+alarmState(read)+'</td><td>'+alarmState(deal)+'</td></tr>'}).join(''):'<tr><td colspan="4" class="empty">\u6682\u65e0\u9884\u8b66\u6570\u636e</td></tr>'}function formatTime(v){if(!v)return '-';var d=new Date(v);if(isNaN(d.getTime()))return String(v);return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+' '+pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds())}function pad(n){return n<10?'0'+n:n}function demo(){rows=[];alarmRender();render([]);el('state').className='state bad';el('state').innerHTML='<i class="fa fa-exclamation-circle"></i> 演示模式';el('personCount').innerText='--';el('alarmCount').innerText='--';el('deviceCount').innerText='--';el('taskCount').innerText='--'}function load(key,requestedPage){var m=modules[key];var path=key==='user'?'/v1/user/get_page_list':key==='log'?'/v1/Operation_Log/get_page_list':'/v1/'+m[1]+'/get_page_list';var code=(user&&user.company_code)||localStorage.stopCompanyCode||'';var payload={pageindex:requestedPage||1,pagesize:key==='alarm'||key==='person'||key==='device'||key==='devicelog'?10:50};if(key==='user'){payload.system_id=2;if(user&&user.company_id)payload.company_id=parseInt(String(user.company_id).replace(/,/g,''),10)}else if(key==='log'){payload.system_id=2}else if(code){if(key==='person'){if(personActiveCode){payload={pageindex:requestedPage||1,pagesize:1000,where:{is_delete:{'$eq':0},in_type:{'$eq':1}},or:[{where:{company_code:{'$eq':personActiveCode}}}]}}else{payload={pageindex:requestedPage||1,pagesize:1000,where:{is_delete:{'$eq':0},in_type:{'$eq':1}},or:personCompanyCodes.map(function(c){return {where:{company_code:{'$eq':c}}}})}}}else if(key==='device'||key==='devicelog'){var selectedCompany=key==='device'?(el('personCompanySelect').value||code):code;var selectedStatus=key==='device'?el('status').value:'';payload={pageindex:requestedPage||1,pagesize:10,where:{company_code:{'$eq':selectedCompany}}};if(selectedStatus!=='')payload.where.e_state={'$eq':Number(selectedStatus)}}else{payload.company_code=code;if(key==='alarm'){payload={pageindex:requestedPage||1,pagesize:10,where:{company_code:{'$eq':code}}}}}}if(key==='alarm'){console.group('[STOP alarm] request');console.log({url:api+path,payload:payload,authorization:token?'Bearer ***':'missing'});console.groupEnd()}if(key==='person'){console.group('[STOP person] request');console.log('url',api+path);console.log('body',payload);console.log('authorization',token?'Bearer ***':'missing');console.groupEnd()}el('state').innerHTML='<i class="fa fa-circle-o-notch fa-spin"></i> CONNECTING';var call=m[3]==='base'?baseReq:req;call(path,{method:'POST',body:JSON.stringify(payload)}).then(function(x){if(key==='alarm'){console.group('[STOP alarm] response');console.log('unwrapped',x);console.log('list',norm(x));console.groupEnd()}if(key==='person'){console.group('[STOP person] response');console.log('unwrapped',x);console.log('list',norm(x));console.log('total',totalOf(x));console.groupEnd()}if(key==='alarm'||key==='person'||key==='device'||key==='devicelog'){var xd=x&&x.data?x.data:x;var xt=totalOf(x);if(key==='alarm')alarmTotal=xt||norm(x).length;else if(key==='person')personTotal=xt||norm(x).length;else if(key==='device')deviceTotal=xt||norm(x).length;else devicelogTotal=xt||norm(x).length}rows=norm(x);if(key==='person'){personCache[personActiveCode||'__all__']=rows.slice()}el('state').className='state ok';el('state').innerHTML='<i class="fa fa-check-circle"></i> API OK';if(key==='alarm'){alarmRender();renderAlarmRows(rows,alarmTotal)}else{render(rows)}}).catch(function(e){if(key==='alarm'){console.error('[STOP alarm] error',e,payload);rows=[];renderAlarmRows([]);el('state').className='state bad';el('state').innerHTML='API ERROR'}else{demo()}})}function ensurePointMap(){if(!window.AMap)return null;if(pointMapInstance)return pointMapInstance;pointMapInstance=new AMap.Map('pointMapCanvas',{resizeEnable:true,zoom:12,center:[115.966,43.91],mapStyle:'amap://styles/normal'});return pointMapInstance}function updatePointMap(points){var map=ensurePointMap();if(!map)return;pointMapMarkers.forEach(function(marker){marker.setMap(null)});pointMapMarkers=[];var valid=[];(points||[]).forEach(function(x){var p=x.GCJ02||x.WGS84||{},lng=Number(p.Lng),lat=Number(p.Lat);if(!isNaN(lng)&&!isNaN(lat)&&lng!==0&&lat!==0){var marker=new AMap.Marker({position:[lng,lat],title:x.Name||x.Equipment_Code||''});marker.setMap(map);valid.push(marker);pointMapMarkers.push(marker)}});if(valid.length)map.setFitView(valid)}function loadGlobal(){var code=(user&&user.company_code)||localStorage.stopCompanyCode||'';var pointUrl=analysisApi+'/Server/GetPoint';requestUrl(pointUrl+'?_='+Date.now(),{method:'POST',cache:'no-store',headers:{'Cache-Control':'no-cache','Pragma':'no-cache'},body:JSON.stringify({type:1,company_code:personCompanyCodes.join('#')})}).then(function(points){points=Array.isArray(points)?points:[];updatePointMap(points);var n=0,a=0,o=0;points.forEach(function(x){var s=Number(x.EquipmentState);if(s===1)n++;else if(s===2)a++;else if(s===3)o++});el('globalTotal').innerText=points.length;el('globalNormal').innerText=n;el('globalAbnormal').innerText=a;el('globalOffline').innerText=o;function state(x){var s=Number(x.EquipmentState);return s===1?'<span class="point-state good">&#27491;&#24120;</span>':s===2?'<span class="point-state warn">&#24322;&#24120;</span>':'<span class="point-state offline">&#311绂?&#32447;</span>'}el('pointList').innerHTML=points.length?points.map(function(x){var p=x.GCJ02||x.WGS84||{};return '<div class="point-item"><span class="point-name">'+esc(x.Name||x.Equipment_Code||'-')+'</span>'+state(x)+'<div class="point-meta">ID:'+esc(x.Equipment_Code||'-')+' &nbsp; GPS:'+esc((p.Lng||'-')+','+(p.Lat||'-'))+' &nbsp; BAT:'+esc(x.Battery==null?'-':x.Battery+'%')+'</div></div>'}).join(''):'<div class="maptext">&#26242;&#26080;&#23450;&#20301;&#28857;&#25968;&#25454;</div>';el('globalTable').innerHTML=points.length?points.map(function(x){return '<tr><td>'+esc(x.Name||'-')+'</td><td>'+esc(x.Equipment_Code||'-')+'</td><td>'+esc(formatTime(x.LocationTime||x.ReportTime))+'</td><td>'+state(x)+'</td></tr>'}).join(''):'<tr><td colspan="4" class="empty">&#26242;&#26080;&#35774;&#22791;&#23450;&#20301;&#25968;&#25454;</td></tr>'}).catch(function(){el('state').className='state bad';el('state').innerHTML='<i class="fa fa-exclamation-circle"></i> API ERROR'})}function configureWork(key){var simple=key==='user'||key==='log';el('keyword').parentNode.style.display=simple||key==='alarm'||key==='person'||key==='device'||key==='devicelog'?'none':'';el('query').style.display=simple||key==='alarm'||key==='devicelog'?'none':'';el('add').style.display=simple||key==='alarm'||key==='person'||key==='device'||key==='devicelog'?'none':'';el('status').parentNode.style.display=key==='device'?'inline-block':'none';el('personCompanyBox').style.display=key==='person'||key==='device'?'inline-block':'none';if(key==='person'||key==='device')el('personCompanySelect').value='nocc185';if(key==='device')el('status').innerHTML='<option value="">&#20840;&#37096;&#29366;&#24577;</option><option value="1">&#24050;&#32465;&#23450;</option><option value="0">&#26410;&#32465;&#23450;</option>';el('keyword').placeholder=key==='person'?'&#22995;&#21517;&#25110;&#30005;&#35805;':key==='device'?'IMEI&#21495;':key==='devicelog'?'&#35774;&#22791;&#32534;&#21495;':key==='alarm'?'&#35774;&#22791;&#32534;&#21495;':'&#36755;&#20837;&#20851;&#38190;&#23383;&#26597;&#35810;';if(key==='alarm')el('status').innerHTML='<option value="">&#20840;&#37096;&#29366;&#24577;</option><option value="unread">&#26410;&#35835;</option><option value="pending">&#26410;&#22788;&#29702;</option>';else if(key==='device')el('status').innerHTML='<option value="">&#20840;&#37096;&#29366;&#24577;</option><option value="1">&#24050;&#32465;&#23450;</option><option value="0">&#26410;&#32465;&#23450;</option>';else el('status').innerHTML='<option value="">&#20840;&#37096;&#29366;&#24577;</option>';form.render('select')}function applyFilter(){var k=el('keyword').value.toLowerCase(),s=el('status').value;var list=rows.filter(function(x){var str=JSON.stringify(x).toLowerCase();if(k&&str.indexOf(k)<0)return false;if(current==='alarm'&&s==='unread'&&Number(x.isread)===1)return false;if(current==='alarm'&&s==='pending'&&Number(x.isdeal)===1)return false;if(current==='device'&&s==='bound'&&!((x.person_name||x.bind_name)))return false;if(current==='device'&&s==='unbound'&&(x.person_name||x.bind_name))return false;return true});page=1;if(current==='alarm'){renderAlarmRows(list)}else{render(list)}}function exportCurrent(){var m=modules[current],path=current==='user'?'/v1/user/get_page_list':current==='log'?'/v1/Operation_Log/get_page_list':'/v1/'+m[1]+'/get_page_list',payload={pageindex:1,pagesize:10000};if(current==='user'||current==='log')payload.system_id=2;else if(user&&user.company_code)payload.company_code=user.company_code;if(current==='alarm'){payload={pageindex:1,pagesize:10000};if(user&&user.company_code)payload.where={company_code:{'$eq':user.company_code}}}if(current==='person'){payload={pageindex:1,pagesize:10000,where:{company_code:{'$eq':user.company_code},is_delete:{'$eq':0},in_type:{'$eq':1}}}}if(current==='device'){payload={pageindex:1,pagesize:10000,where:{company_code:{'$eq':user.company_code}}}}if(current==='devicelog'){var exportCompany=el('personCompanySelect').value||user.company_code;payload={pageindex:1,pagesize:10000,where:{company_code:{'$eq':exportCompany}}};if(el('status').value!=='')payload.where.send_state={'$eq':Number(el('status').value)}}var call=m[3]==='base'?baseReq:req;call(path,{method:'POST',body:JSON.stringify(payload)}).then(function(x){var list=norm(x);if((current==='alarm'||current==='person'||current==='device'||current==='devicelog')&&!list.length)list=rows;var out=list.map(function(r){if(current==='log')return [r.sys_name,r.operation_type,r.content,r.operation_name,r.ip,formatTime(r.add_time)];if(current==='user')return [r.user_name,r.company_name,r.role_name,r.is_disable?'&#24050;&#31105;&#29992;':'&#24050;&#21551;&#29992;'];if(current==='person')return [r.company_name,r.name||r.person_name,r.sex||r.gender,r.id_card||r.idcard,r.phone,formatTime(r.create_time||r.add_time)];if(current==='device')return [r.equipment_name||r.device_name||r.name,r.imei||r.IMEI||r.equipment_code,r.pname||r.person_name||r.bind_name,r.electric==null?(r.Battery==null?r.battery:r.Battery):r.electric,Number(r.e_state)===1?'&#24050;&#32465;&#23450;':Number(r.e_state)===0?'&#26410;&#32465;&#23450;':'-'];if(current==='devicelog')return [r.equipment_code||r.device_code||'',formatTime(r.send_time),r.id==null?'':r.id,formatTime(r.resp_time),r.send_data||'',r.resp_data||'',Number(r.send_state)===1?'&#25104;&#21151;':Number(r.send_state)===0?'&#22833;&#36133;':'',Number(r.resp_state)===1?'&#25104;&#21151;':Number(r.resp_state)===0?'&#22833;&#36133;':'',r.company_name||''];return [r.Name||r.name||r.equipment_name,r.Equipment_Code||r.equipment_code,formatTime(r.alarmtime||r.alarm_time),decodeText(r.alarm_name||r.alarm_type_name),decodeText(r.isread===1?'&#24050;&#35835;':'&#26410;&#35835;'),decodeText(r.isdeal===1?'&#24050;&#22788;&#29702;':'&#26410;&#22788;&#29702;')]});var csv=out.map(function(a){return a.map(function(v){return '"'+String(v==null?'':v).replace(/[\r\n\t]/g,' ').replace(/"/g,'""')+'"'}).join(',')}).join('\r\n');var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download=(modules[current]?modules[current][0]:'data')+'.csv';a.click()}).catch(function(){layer.msg('&#23548;&#20986;&#22833;&#36133;')})}function renderTabs(){var box=el('tabs');box.innerHTML=tabList.map(function(k){return '<span class="tab '+(k===current?'active':'')+'" data-tab="'+k+'">'+(k==='dashboard'?'&#36816;&#34892;&#24635;&#35272;':(modules[k]?modules[k][0]:k))+(k==='dashboard'?'':'<b class="close" data-close="'+k+'">&#215;</b>')+'</span>'}).join('');box.querySelectorAll('.tab').forEach(function(t){t.onclick=function(e){if(e.target.dataset.close){var k=e.target.dataset.close;if(k!=='dashboard'){tabList=tabList.filter(function(x){return x!==k});if(current===k)current=tabList[tabList.length-1]||'dashboard';show(current,false);renderTabs()}return}show(t.dataset.tab,false)}})}function show(key,addTab){if(addTab!==false&&tabList.indexOf(key)<0)tabList.push(key);current=key;document.querySelectorAll('.page').forEach(function(x){x.classList.add('hide')});document.querySelectorAll('.nav a').forEach(function(x){x.classList.toggle('active',x.dataset.key===key)});el('dashboard').classList.toggle('hide',key!=='dashboard');if(key==='dashboard'){el('pageTitle').innerHTML='&#36816;&#34892;&#24635;&#35272;';el('pageDesc').innerHTML='&#23454;&#26102;&#25484;&#25569;&#26426;&#22330;&#20154;&#21592;&#12289;&#35774;&#22791;&#19982;&#39044;&#35686;&#29366;&#24577;';loadDashboard();renderTabs();return}if(key==='monitor'){el('globalPage').classList.remove('hide');el('pageTitle').innerHTML='&#23450;&#20301;&#30417;&#25511;';el('pageDesc').innerHTML='&#23454;&#26102;&#26597;&#30475;&#20154;&#21592;&#35774;&#22791;&#23450;&#20301;&#19982;&#22312;&#32447;&#29366;&#24577;';loadGlobal();renderTabs();return}if(key==='dispatch'||key==='polygon'){el('map').classList.remove('hide');el('mapTitle').innerText=modules[key][0];el('pageTitle').innerText=modules[key][0];el('pageDesc').innerHTML='&#31354;&#38388;&#25968;&#25454;&#19982;&#23454;&#26102;&#23450;&#20301;&#20449;&#24687;';renderTabs();return}if(key==='track'){el('trackPage').classList.remove('hide');el('pageTitle').innerText='&#36712;&#36857;&#26597;&#35810;';el('pageDesc').innerText='&#26597;&#35810;&#20154;&#21592;&#25110;&#35774;&#22791;&#21382;&#21490;&#36712;&#36857;';renderTabs();return}if(key==='setting'){el('setting').classList.remove('hide');el('pageTitle').innerText='&#25509;&#21475;&#37197;&#32622;';el('pageDesc').innerText='&#37197;&#32622;&#24037;&#20316;&#26381;&#21153;&#21644;&#39029;&#38754;&#21047;&#26032;&#31574;&#30053;';renderTabs();return}el('work').classList.remove('hide');page=1;if(key==='person')personActiveCode='';configureWork(key);el('workTitle').innerText=modules[key][0];el('pageTitle').innerText=modules[key][0];el('pageDesc').innerHTML='&#31649;&#29702; '+modules[key][0]+' &#25968;&#25454;';load(key);renderTabs()}el('personCompanySelect').addEventListener('change',function(){personActiveCode=this.value});document.querySelectorAll('.nav a,[data-go]').forEach(function(x){x.addEventListener('click',function(){var k=x.dataset.key||x.dataset.go;if(x.dataset.route){history.pushState({},'',x.dataset.route)}show(k)})});el('workTable').addEventListener('click',function(e){var b=e.target.closest('[data-action]');if(!b)return;var id=b.dataset.id;if(b.dataset.action==='detail-alarm'){var row=rows.find(function(x){return String(x.id)===String(id)});layer.open({type:1,title:'DETAIL',content:'<pre>'+esc(JSON.stringify(row||{},null,2))+'</pre>'})}else if(b.dataset.action==='deal-alarm'){req('/v1/AlarmRecord/put',{method:'PUT',body:JSON.stringify({id:id,isdeal:1})}).then(function(){layer.msg('DONE');load('alarm')}).catch(function(){layer.msg('FAILED')})}else if(b.dataset.action==='delete-log'){layer.confirm('DELETE?',function(i){layer.close(i);req('/v1/EquipmentLog/'+encodeURIComponent(id),{method:'DELETE'}).then(function(){layer.msg('DONE');load('devicelog')}).catch(function(){layer.msg('FAILED')})})}});el('refresh').onclick=function(){if(current==='dashboard')loadDashboard();else show(current)};el('loginBtn').onclick=function(){show('setting');el('loginUser').focus()};el('loginSubmit').onclick=loginServer;el('captchaCode').onclick=makeCaptcha;el('logoutBtn').onclick=logoutServer;el('serverLogin').onclick=loginServer;el('query').onclick=function(){if(current==='person'){personActiveCode=el('personCompanySelect').value;personCache[personActiveCode]=null;page=1;load('person',1)}else if(current==='device'){page=1;load('device',1)}else{applyFilter()}};el('add').onclick=function(){layer.prompt({title:'请输入名称或编号'},function(v,index){layer.close(index);layer.msg('已准备新增“'+esc(v)+'”，请根据后端字段继续保存')})};el('export').onclick=exportCurrent;function legacyExport(){var csv='编号,名称,机构,更新时间\n'+rows.map(function(x){return [x.id||x.code||'',x.name||x.person_name||'',x.company_name||'',x.update_time||''].join(',')}).join('\n');var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download=(modules[current]?modules[current][0]:'数据')+'.csv';a.click()};el('save').onclick=function(){api=el('apiInput').value.replace(/\/$/,'');var seconds=Math.max(5,Number(el('refreshSeconds').value||60));refreshSeconds=seconds;localStorage.stopWorkApi=api;localStorage.stopRefreshSeconds=String(seconds);el('refreshSeconds').value=seconds;scheduleDashboardRefresh();layer.msg('&#37197;&#32622;&#24050;&#20445;&#23384;');show(current)};el('test').onclick=function(){show('dashboard');loadDashboard();load('alarm')};el('globalRefresh').onclick=loadGlobal;el('trackQuery').onclick=function(){if(!el('trackPerson').value||!el('trackDate').value)return layer.msg('请输入人员/设备和日期');el('trackMessage').innerText='已提交轨迹查询，待接入地图点位绘制';req('/v1/Locationrecord/getLocationByDate',{method:'POST',body:JSON.stringify({code:el('trackPerson').value,date:el('trackDate').value})}).catch(function(){})};el('mobile').onclick=function(){el('side').style.display=el('side').style.display==='block'?'none':'block'};el('apiInput').value=api;el('refreshSeconds').value=refreshSeconds;updateUserState();makeCaptcha();if(token)el('loginPanel').style.display='none';setInterval(function(){el('clock').innerText=new Date().toLocaleString()},1000);function scheduleDashboardRefresh(){if(refreshTimer)clearInterval(refreshTimer);refreshTimer=setInterval(function(){loadDashboard()},refreshSeconds*1000)}scheduleDashboardRefresh();show('dashboard');loadDashboard();load('alarm')});
+</script>
+</body></html>

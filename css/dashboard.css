@@ -166,6 +166,21 @@ body::before{content:"";position:absolute;inset:0;background-image:
 .dept-skin .layui-layer-setwin .layui-layer-close1{background-position:1px -40px;filter:brightness(2)}
 .dept-skin .layui-layer-content{color:var(--text)!important}
 
+/* STOP 弹层：外层不滚动，iframe 100% 铺满内容区，避免 body+iframe 双滚动条 */
+.stop-skin .layui-layer-content{
+  overflow:hidden!important;
+  padding:0!important;
+  height:calc(100% - 42px)!important;
+}
+.stop-skin iframe{
+  width:100%!important;
+  height:100%!important;
+  border:0;
+  display:block;
+  background:#f4f7fb;
+}
+.stop-remote-link:hover{color:var(--cyan)!important}
+
 /* 弹窗内部通用 */
 .modal-box{padding:12px 16px;max-height:calc(90vh - 60px);overflow:auto}
 .modal-box h4{font-size:13px;color:var(--cyan);margin:8px 0;border-left:3px solid var(--cyan);padding-left:8px}
