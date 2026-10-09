@@ -59,7 +59,13 @@
     var names = p.departments.map(function (d) { return d.name; });
     var vals = p.departments.map(function (d) { return d.online; });
     var chart = regChart('chartDept', {
-      tooltip: { trigger: 'axis' },
+      tooltip: {
+        trigger: 'axis',
+        confine: true,
+        backgroundColor: 'rgba(4,18,40,.94)',
+        borderColor: 'rgba(0,231,255,.45)',
+        textStyle: { color: '#e6f7ff', fontSize: 12 }
+      },
       grid: { left: '3%', right: '4%', bottom: '2%', top: '18%', containLabel: true },
       xAxis: {
         type: 'category', data: names,
@@ -83,10 +89,14 @@
         }
       }]
     });
-    // 点击柱体打开对应部门
+    // 点击柱体只开对应部门。标记放在原生 click 冒泡之前，避免面板再开一层。
     if (chart) {
       chart.off('click');
       chart.on('click', function (params) {
+        chart.__deptBarClick = true;
+        chart.dispatchAction({ type: 'hideTip' });
+        var raw = params.event && params.event.event;
+        if (raw && raw.stopPropagation) raw.stopPropagation();
         openDeptModal(params.name);
       });
     }
@@ -112,11 +122,12 @@
       area: ['860px', '80%'],
       shadeClose: true,
       content: html,
-      success: function () {
+      success: function (layero) {
+        var $box = $(layero);
         function show(id) {
           var d = p.departments.filter(function (x) { return x.id === id; })[0] || p.departments[0];
-          $('#deptTabs span').removeClass('active');
-          $('#deptTabs span[data-id="' + d.id + '"]').addClass('active');
+          $box.find('#deptTabs span').removeClass('active');
+          $box.find('#deptTabs span[data-id="' + d.id + '"]').addClass('active');
           var h = '';
           h += '<div class="leader-card"><div class="avatar">👤</div><div class="info">';
           h += '<b>' + d.leader.name + '</b>';
@@ -143,14 +154,14 @@
             });
             h += '</tbody></table></div>';
           });
-          $('#deptDetail').html(h);
-          // 弹窗内文案也可编辑（无 data-k 的纯展示不强制）
+          $box.find('#deptDetail').html(h);
         }
         var first = focusName
           ? (p.departments.filter(function (x) { return x.name === focusName; })[0] || p.departments[0])
           : p.departments[0];
         show(first.id);
-        $('#deptTabs').on('click', 'span', function () {
+        $box.find('#deptTabs').on('click', 'span', function (ev) {
+          ev.stopPropagation();
           show($(this).data('id'));
         });
       }
@@ -457,8 +468,12 @@
   /* ---------- 绑定面板点击 ---------- */
   function bindClicks() {
     $('#panelLeft1').on('click', function (e) {
-      // 避免点编辑文案时误开弹窗
+      // 避免点编辑文案时误开弹窗；柱体点击已在图表里单独打开
       if ($(e.target).closest('.ed').length) return;
+      if (charts.chartDept && charts.chartDept.__deptBarClick) {
+        charts.chartDept.__deptBarClick = false;
+        return;
+      }
       openDeptModal();
     });
     $('#panelLeft2').on('click', function (e) {

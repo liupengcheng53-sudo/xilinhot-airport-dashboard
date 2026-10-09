@@ -21,28 +21,29 @@ body::before{content:"";position:absolute;inset:0;background-image:
 .app{position:relative;z-index:2;display:flex;flex-direction:column;height:100%;padding:0 .6vw .4vh}
 
 /* ===== 顶部栏 ===== */
-.topbar{height:7vh;min-height:58px;display:flex;align-items:center;justify-content:space-between;
+.topbar{height:7.2vh;min-height:64px;display:flex;align-items:center;justify-content:space-between;gap:10px;
   background:linear-gradient(90deg,rgba(0,40,80,.35),rgba(0,80,160,.18),rgba(0,40,80,.35));
   border:1px solid rgba(0,150,255,.20);border-radius:12px;box-shadow:0 0 30px rgba(0,100,200,.08);
-  backdrop-filter:blur(6px);padding:0 1.2vw;position:relative;flex-shrink:0;margin-bottom:.5vh}
-.topbar::after{content:"";position:absolute;bottom:-1px;left:10%;width:80%;height:1px;
+  backdrop-filter:blur(6px);padding:0 1vw;position:relative;flex-shrink:0;margin-bottom:.5vh;overflow:hidden}
+.topbar::after{content:"";position:absolute;bottom:0;left:10%;width:80%;height:1px;
   background:linear-gradient(90deg,transparent,rgba(0,180,255,.5),transparent)}
-.weather-summary{width:18%;font-size:13px;line-height:1.5;color:#fff}
-.weather-summary strong{font-size:18px}
-.brand{text-align:center;width:36%;min-width:280px}
-.brand small{font-size:11px;letter-spacing:3px;color:var(--cyan);display:block}
-.brand h1{font-size:clamp(16px,1.5vw,26px);letter-spacing:4px;margin-top:2px;
+.weather-summary{flex:0 0 auto;font-size:13px;line-height:1.3;color:#fff;white-space:nowrap}
+.weather-summary strong{font-size:16px}
+.brand{text-align:center;flex:1 1 auto;min-width:0;width:auto}
+.brand small{font-size:11px;letter-spacing:2px;color:var(--cyan);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.brand h1{font-size:clamp(15px,1.25vw,26px);letter-spacing:clamp(1px,.2vw,4px);margin-top:0;line-height:1.25;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
   text-shadow:0 0 16px rgba(0,231,255,.8);background:linear-gradient(180deg,#fff,#00e7ff);
   -webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.topright{width:42%;display:flex;align-items:center;justify-content:flex-end;gap:.6vw;flex-wrap:wrap}
-.duty-info{flex:0 1 180px;min-width:120px;text-align:center;font-size:12px;line-height:1.5}
-.duty-info a{display:block;color:#fff;text-decoration:none;border-bottom:1px dashed rgba(0,231,255,.45);padding:2px 0}
-.clock{text-align:right;font-variant-numeric:tabular-nums}
-.clock .t{font-size:clamp(16px,1.3vw,24px);font-weight:300;letter-spacing:1px;color:#b0daff}
-.clock .d{font-size:11px;color:var(--dim)}
-.nav{display:flex;gap:6px;background:rgba(0,20,50,.6);border-radius:20px;padding:3px;border:1px solid rgba(0,150,255,.15)}
+.topright{flex:0 0 auto;width:auto;display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:nowrap;min-width:0}
+.duty-info{flex:0 1 auto;min-width:0;max-width:220px;text-align:center;font-size:12px;line-height:1.3}
+.duty-info a{display:block;color:#fff;text-decoration:none;border-bottom:1px dashed rgba(0,231,255,.45);padding:2px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.clock{flex:0 0 auto;text-align:right;font-variant-numeric:tabular-nums;line-height:1.15}
+.clock .t{font-size:clamp(16px,1.15vw,22px);font-weight:300;letter-spacing:1px;line-height:1.1;color:#b0daff;white-space:nowrap}
+.clock .d{font-size:11px;line-height:1.25;color:var(--dim);white-space:nowrap;margin-top:1px}
+.nav{display:flex;flex:0 0 auto;gap:6px;background:rgba(0,20,50,.6);border-radius:20px;padding:3px;border:1px solid rgba(0,150,255,.15)}
 .nav-btn{border:none;background:transparent;color:#7aabcc;font-size:13px;padding:5px 14px;border-radius:16px;
-  cursor:pointer;transition:all .3s;letter-spacing:1px;font-family:inherit;text-decoration:none;display:inline-block}
+  cursor:pointer;transition:all .3s;letter-spacing:1px;font-family:inherit;text-decoration:none;display:inline-block;white-space:nowrap}
 .nav-btn:hover{color:#b0daff;background:rgba(0,80,160,.25)}
 .nav-btn.active{background:rgba(0,150,255,.28);color:#fff;box-shadow:0 0 18px rgba(0,150,255,.2)}
 .nav-btn.nav-stop{color:#ffd9a3;border:1px solid rgba(255,170,0,.45);background:rgba(255,120,0,.12);font-weight:600}
