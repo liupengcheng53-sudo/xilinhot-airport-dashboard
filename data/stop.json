@@ -5,7 +5,7 @@
   "alarms": 3,
   "localUrl": "stop.html",
   "url": "http://111.56.250.18:9001/#/global",
-  "mockNote": "以下为本地 mock 态势摘要（演示兜底）。完整 STOP：新窗口打开远端原站，或本地 npm start 后打开 stop.html（走 /stop-*-api 代理）。勿在弹窗内嵌远端登录，易锁号 / 无权访问。",
+  "mockNote": "上区为本地 mock 态势摘要（演示兜底）；下区同源嵌入 stop.html（需 npm start 代理 /stop-*-api）。次要：新窗口打开远端原站；勿在 iframe 内嵌远端登录，易锁号 / 无权访问。",
   "devices": [
     {"name": "定位终端", "online": 168, "total": 172},
     {"name": "车载终端", "online": 42, "total": 45},

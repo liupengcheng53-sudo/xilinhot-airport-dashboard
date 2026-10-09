@@ -166,30 +166,68 @@ body::before{content:"";position:absolute;inset:0;background-image:
 .dept-skin .layui-layer-setwin .layui-layer-close1{background-position:1px -40px;filter:brightness(2)}
 .dept-skin .layui-layer-content{color:var(--text)!important}
 
-/* STOP 弹层：外层不滚动，iframe 100% 铺满内容区，避免 body+iframe 双滚动条 */
+/* STOP 弹层（上 mock + 下 iframe）：外层 overflow:hidden，避免双滚动条 */
 .stop-skin .layui-layer-content{
   overflow:hidden!important;
   padding:0!important;
   height:calc(100% - 42px)!important;
 }
-.stop-skin iframe{
+/* 整层纵向 flex：上区固定高度，下区 flex:1 铺满 */
+.stop-modal-wrap{
+  display:flex;
+  flex-direction:column;
+  height:100%;
+  overflow:hidden;
+  box-sizing:border-box;
+}
+.stop-modal-top{
+  flex-shrink:0;
+  padding:10px 14px 8px;
+  border-bottom:1px solid rgba(0,231,255,.22);
+  background:rgba(0,20,40,.55);
+  overflow:hidden;
+}
+.stop-modal-note{font-size:12px;color:#8fb0c7;margin:0 0 8px;line-height:1.45}
+.stop-modal-stats{margin-bottom:8px;grid-template-columns:repeat(4,1fr)}
+.stop-modal-top-row{
+  display:flex;
+  gap:12px;
+  align-items:stretch;
+}
+.stop-modal-tbl{flex:1;min-width:0;margin:0}
+.stop-modal-tbl th,.stop-modal-tbl td{padding:4px 8px;font-size:12px}
+.stop-modal-side{
+  width:220px;
+  flex-shrink:0;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  gap:6px;
+}
+.stop-modal-side .stop-link{display:inline-block;margin:0;text-align:left}
+.stop-modal-tip{font-size:11px;color:#8fb0c7;line-height:1.45;margin:0}
+.stop-modal-tip code{color:var(--cyan);font-size:10px}
+.stop-remote-link:hover{color:var(--cyan)!important}
+/* 下区占满剩余高度，iframe 宽高 100%，仅 stop.html 内侧栏/主区滚动 */
+.stop-modal-bottom{
+  flex:1;
+  min-height:0;
+  overflow:hidden;
+  position:relative;
+  background:#f4f7fb;
+}
+.stop-modal-iframe,
+.stop-skin .stop-modal-iframe{
   width:100%!important;
   height:100%!important;
   border:0;
   display:block;
   background:#f4f7fb;
 }
-.stop-remote-link:hover{color:var(--cyan)!important}
-
-/* STOP 摘要弹窗（type:1）：操作区与说明 */
-.stop-modal-note{font-size:12px;color:#8fb0c7;margin-bottom:10px;line-height:1.5}
-.stop-modal-stats{margin-bottom:12px;grid-template-columns:repeat(4,1fr)}
-.stop-modal-actions{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 8px}
-.stop-modal-actions .layui-btn{margin:0}
-.stop-modal-tip{font-size:12px;color:#8fb0c7;line-height:1.55;margin:6px 0}
-.stop-modal-tip code{color:var(--cyan);font-size:11px}
 @media (max-width:900px){
   .stop-modal-stats{grid-template-columns:1fr 1fr}
+  .stop-modal-top-row{flex-direction:column}
+  .stop-modal-side{width:auto}
 }
 
 /* 弹窗内部通用 */
