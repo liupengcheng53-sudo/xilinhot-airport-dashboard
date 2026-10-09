@@ -1,0 +1,11 @@
+{
+  "channels": [
+    {"name": "通道A", "queue": 28, "waitMin": 12, "status": "繁忙"},
+    {"name": "通道B", "queue": 15, "waitMin": 6, "status": "正常"},
+    {"name": "通道C", "queue": 8, "waitMin": 3, "status": "畅通"},
+    {"name": "通道D（VIP）", "queue": 2, "waitMin": 1, "status": "畅通"}
+  ],
+  "totalQueue": 53,
+  "avgWait": 7,
+  "note": "领导未定口径，本模块为占位演示"
+}

@@ -1,0 +1,14 @@
+{
+  "onlinePeople": 186,
+  "onlineDevices": 342,
+  "coverage": "98.6%",
+  "alarms": 3,
+  "url": "http://111.56.250.18:9001/#/global",
+  "mockNote": "远端 STOP 系统可能不可达，下方为 mock 兜底展示",
+  "devices": [
+    {"name": "定位终端", "online": 168, "total": 172},
+    {"name": "车载终端", "online": 42, "total": 45},
+    {"name": "固定基站", "online": 18, "total": 18},
+    {"name": "手持对讲", "online": 114, "total": 120}
+  ]
+}

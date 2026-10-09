@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>锡林浩特机场AI智能大数据综合管理平台</title>
+<!-- Layui / ECharts / 自有样式：路径相对本文件，本地直接打开或用静态服务器均可 -->
+<link rel="stylesheet" href="lib/layui/css/layui.css" />
+<link rel="stylesheet" href="css/dashboard.css" />
+</head>
+<body>
+<div class="app">
+  <!-- ===== 顶部栏 ===== -->
+  <header class="topbar">
+    <div class="weather-summary" id="topWeather"><strong>晴 --℃</strong></div>
+    <div class="brand">
+      <small class="ed" data-k="brand_en">XILINHOT AIRPORT · AI BIG DATA PLATFORM</small>
+      <h1 class="ed" data-k="brand_cn">锡林浩特机场AI智能大数据综合管理平台</h1>
+    </div>
+    <div class="duty-info">
+      <a href="javascript:;" class="ed" data-k="duty_leader">带班领导：***，01号领导：***</a>
+    </div>
+    <div class="topright">
+      <div class="clock">
+        <div class="t" id="clock">--:--:--</div>
+        <div class="d" id="date">----年--月--日</div>
+      </div>
+      <div class="nav">
+        <a class="nav-btn active ed" data-k="nav_home" href="index.html">首屏</a>
+        <a class="nav-btn ed" data-k="nav_flight" href="flight.html">航班详情</a>
+        <a class="nav-btn nav-stop ed" data-k="nav_stop" href="javascript:;" id="btnStopNav">STOP预警</a>
+      </div>
+      <div class="edit-toolbar">
+        <button type="button" class="layui-btn layui-btn-sm" id="btnExport"><span class="ed" data-k="btn_export">导出文案</span></button>
+        <button type="button" class="layui-btn layui-btn-sm" id="btnImport"><span class="ed" data-k="btn_import">导入文案</span></button>
+        <span class="edit-hint ed" data-k="edit_hint">双击文案可编辑</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== 九宫格 ===== -->
+  <main class="stage">
+    <div class="grid33">
+
+      <!-- 左1 在场人数+部门 -->
+      <section class="panel clickable" id="panelLeft1">
+        <div class="panel-title">
+          <span class="ed" data-k="left1_title">在场人数 · 部门分布</span>
+          <span class="tag ed" data-k="left1_tag">点击查看班组详情</span>
+        </div>
+        <div class="panel-body" style="display:flex;flex-direction:column">
+          <div class="kpi-hero">
+            <label class="ed" data-k="left1_total_label">目前在场人数</label>
+            <strong id="onSiteTotal">--</strong>
+            <small>PERSONS</small>
+          </div>
+          <div id="chartDept" class="chart-box" style="flex:1"></div>
+        </div>
+      </section>
+
+      <!-- 中1 航班摘要 -->
+      <section class="panel clickable" id="panelMid1">
+        <div class="panel-title">
+          <span class="ed" data-k="mid1_title">航班运行摘要</span>
+          <span class="tag ed" data-k="mid1_tag">今日</span>
+        </div>
+        <div class="panel-body">
+          <div class="kpi-grid4">
+            <div class="kpi"><b id="fTotal">--</b><span>今日航班</span></div>
+            <div class="kpi"><b id="fOntime">--</b><span>正点率</span></div>
+            <div class="kpi"><b id="fDelay">--</b><span>延误架次</span></div>
+            <div class="kpi"><b id="fAvgDelay">--</b><span>平均延误(分)</span></div>
+          </div>
+          <p style="text-align:center;margin-top:1.2vh;font-size:12px;color:#8fb0c7">点击进入「航班表格 + 机位甘特」同一数据页</p>
+        </div>
+      </section>
+
+      <!-- 右1 气象 -->
+      <section class="panel" id="panelRight1">
+        <div class="panel-title">
+          <span class="ed" data-k="right1_title">实时气象</span>
+          <span class="tag ed" data-k="right1_tag">气象站</span>
+        </div>
+        <div class="panel-body" style="display:flex;flex-direction:column">
+          <div class="weather-main">
+            <div class="weather-icon" id="wIcon">☀️</div>
+            <div class="weather-info">
+              <div class="temp" id="wTemp">--℃</div>
+              <div class="desc" id="wDesc">--</div>
+            </div>
+          </div>
+          <div class="weather-grid" id="wGrid"></div>
+          <div id="chartWindMini" class="chart-box" style="flex:1;min-height:70px;margin-top:.3vh"></div>
+        </div>
+      </section>
+
+      <!-- 左2 设施设备 -->
+      <section class="panel clickable" id="panelLeft2">
+        <div class="panel-title">
+          <span class="ed" data-k="left2_title">设施设备</span>
+          <span class="tag ed" data-k="left2_tag">数量 / 状态</span>
+        </div>
+        <div class="panel-body">
+          <div class="fac-grid" id="facHomeGrid"></div>
+        </div>
+      </section>
+
+      <!-- 中2 航班动态入口 -->
+      <section class="panel clickable" id="panelMid2">
+        <div class="panel-title">
+          <span class="ed" data-k="mid2_title">航班动态入口</span>
+          <span class="tag ed" data-k="mid2_tag">表格 · 机位甘特</span>
+        </div>
+        <div class="panel-body" style="display:flex;flex-direction:column">
+          <div class="table-scroll">
+            <table class="tbl" id="flightNextTable">
+              <thead><tr><th>航班</th><th>方向</th><th>时间</th><th>状态</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <p style="text-align:center;font-size:12px;color:#00e7ff;margin-top:.3vh">点击打开详情页 →</p>
+        </div>
+      </section>
+
+      <!-- 右2 STOP -->
+      <section class="panel clickable" id="panelRight2">
+        <div class="panel-title">
+          <span class="ed" data-k="right2_title">STOP 在线态势</span>
+          <span class="tag ed" data-k="right2_tag">人数 · 设备</span>
+        </div>
+        <div class="panel-body">
+          <div class="stop-stats">
+            <div class="kpi"><b id="stopPeople">--</b><span>在线人数</span></div>
+            <div class="kpi"><b id="stopDevices">--</b><span>在线设备</span></div>
+            <div class="kpi"><b id="stopCover">--</b><span>定位覆盖</span></div>
+            <div class="kpi"><b id="stopAlarms" style="color:#ffaa00">--</b><span>异常事件</span></div>
+          </div>
+          <p style="text-align:center;font-size:12px;color:#8fb0c7">点击打开 STOP（iframe / mock 兜底）</p>
+        </div>
+      </section>
+
+      <!-- 左3 行为上墙 -->
+      <section class="panel clickable" id="panelLeft3">
+        <div class="panel-title">
+          <span class="ed" data-k="left3_title">行为上墙</span>
+          <span class="tag ed" data-k="left3_tag">故障 / 严重问题通报</span>
+        </div>
+        <div class="panel-body table-scroll">
+          <table class="tbl" id="behaviorTable">
+            <thead><tr><th>时间</th><th>等级</th><th>类型</th><th>地点</th><th>状态</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- 中3 安检排队占位 -->
+      <section class="panel" id="panelMid3">
+        <div class="panel-title">
+          <span class="ed" data-k="mid3_title">安检排队情况</span>
+          <span class="tag ed" data-k="mid3_tag">占位 · 待确认</span>
+        </div>
+        <div class="panel-body">
+          <div class="queue-list" id="queueBox"></div>
+        </div>
+      </section>
+
+      <!-- 右3 AI 态势预警 -->
+      <section class="panel clickable" id="panelRight3">
+        <div class="panel-title">
+          <span class="ed" data-k="right3_title">AI 态势预警</span>
+          <span class="tag ed" data-k="right3_tag" id="aiTag">分析图</span>
+        </div>
+        <div class="panel-body" style="display:flex;flex-direction:column">
+          <div id="chartAi" class="chart-box" style="flex:1;min-height:90px"></div>
+          <ul class="alarm-list" id="aiAlarms" style="max-height:38%;flex-shrink:0"></ul>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <div class="marquee"><div class="marquee-content ed" data-k="marquee" id="marqueeText">加载中…</div></div>
+</div>
+
+<script src="lib/jquery/jquery-3.4.1.min.js"></script>
+<script src="lib/echarts/echarts.min.js"></script>
+<script src="lib/layui/layui.js"></script>
+<script src="js/editable.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

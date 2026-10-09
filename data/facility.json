@@ -1,0 +1,11 @@
+{
+  "items": [
+    {"key": "ground", "name": "地服设备", "total": 48, "online": 45, "fault": 2, "offline": 1, "status": "正常"},
+    {"key": "bridge", "name": "廊桥", "total": 6, "online": 5, "fault": 1, "offline": 0, "status": "预警"},
+    {"key": "fuel", "name": "加油车", "total": 8, "online": 7, "fault": 0, "offline": 1, "status": "正常"},
+    {"key": "shuttle", "name": "摆渡车", "total": 12, "online": 11, "fault": 1, "offline": 0, "status": "正常"},
+    {"key": "bird", "name": "驱鸟车", "total": 4, "online": 4, "fault": 0, "offline": 0, "status": "正常"},
+    {"key": "camera", "name": "摄像头", "total": 286, "online": 278, "fault": 3, "offline": 5, "status": "正常"},
+    {"key": "network", "name": "网络设备", "total": 66, "online": 64, "fault": 1, "offline": 1, "status": "正常"}
+  ]
+}

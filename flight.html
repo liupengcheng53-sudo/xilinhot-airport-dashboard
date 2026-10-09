@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>航班协同 · 表格与机位甘特 — 锡林浩特机场</title>
+<link rel="stylesheet" href="lib/layui/css/layui.css" />
+<link rel="stylesheet" href="css/dashboard.css" />
+</head>
+<body>
+<div class="app flight-page">
+  <header class="topbar">
+    <div class="weather-summary"><a href="index.html" style="color:#00e7ff;text-decoration:none">← 返回首屏</a></div>
+    <div class="brand">
+      <small class="ed" data-k="brand_en">XILINHOT AIRPORT · AI BIG DATA PLATFORM</small>
+      <h1 class="ed" data-k="flight_page_title">航班协同 · 表格与机位甘特</h1>
+    </div>
+    <div class="topright">
+      <div class="clock">
+        <div class="t" id="clock">--:--:--</div>
+        <div class="d" id="date">----年--月--日</div>
+      </div>
+      <div class="nav">
+        <a class="nav-btn ed" data-k="nav_home" href="index.html">首屏</a>
+        <a class="nav-btn active ed" data-k="nav_flight" href="flight.html">航班详情</a>
+      </div>
+      <div class="edit-toolbar">
+        <button type="button" class="layui-btn layui-btn-sm" id="btnExport"><span class="ed" data-k="btn_export">导出文案</span></button>
+        <button type="button" class="layui-btn layui-btn-sm" id="btnImport"><span class="ed" data-k="btn_import">导入文案</span></button>
+      </div>
+    </div>
+  </header>
+
+  <main class="stage">
+    <div class="flight-tabs">
+      <div class="ftab active ed" data-k="flight_tab_table" data-tab="table">关联航班表格</div>
+      <div class="ftab ed" data-k="flight_tab_gantt" data-tab="gantt">机位甘特图</div>
+      <label style="margin-left:auto;font-size:12px;color:#8fb0c7;display:flex;align-items:center;gap:6px">
+        <input type="checkbox" id="chkShowDisabled" /> 显示禁用机位
+      </label>
+    </div>
+
+    <!-- 表格面板：行底色来自 flights.json statusColors -->
+    <section class="panel flight-panel active" id="panel-table" style="flex:1">
+      <div class="panel-title">
+        <span>锡林浩特协同共享平台风格 · 关联航班</span>
+        <span class="tag">数据源 data/flights.json</span>
+      </div>
+      <div class="panel-body" style="display:flex;flex-direction:column">
+        <div class="table-scroll" style="flex:1">
+          <table class="tbl" id="flightMainTable">
+            <thead>
+              <tr>
+                <th>序号</th><th>日期</th><th>登机口</th><th>航班号 进/出</th>
+                <th>机型/机号</th><th>机位</th><th>计划/实际到达</th>
+                <th>计划/实际起飞</th><th>TOBT</th><th>COBT</th><th>状态</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="kpi-grid4" style="margin-top:.5vh;flex-shrink:0">
+          <div class="kpi"><b id="statTotal">--</b><span>航班合计</span></div>
+          <div class="kpi"><b id="statArr">--</b><span>进港</span></div>
+          <div class="kpi"><b id="statDep">--</b><span>出港</span></div>
+          <div class="kpi"><b>同一 JSON</b><span>表格↔甘特</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 甘特面板 -->
+    <section class="panel flight-panel" id="panel-gantt" style="flex:1">
+      <div class="panel-title">
+        <span>机位甘特图</span>
+        <span class="tag">stands[].occupancy ↔ flights[]</span>
+      </div>
+      <div class="legend" id="ganttLegend"></div>
+      <div class="panel-body gantt-wrap" id="ganttWrap"></div>
+    </section>
+  </main>
+
+  <div class="marquee"><div class="marquee-content ed" data-k="marquee">表格与甘特共用 data/flights.json</div></div>
+</div>
+
+<script src="lib/jquery/jquery-3.4.1.min.js"></script>
+<script src="lib/layui/layui.js"></script>
+<script src="js/editable.js"></script>
+<script src="js/flight.js"></script>
+</body>
+</html>

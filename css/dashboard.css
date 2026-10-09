@@ -1,0 +1,231 @@
+/* ============================================================
+ * 锡林浩特机场 AI 智能大数据大屏 — 全局样式
+ * 风格对齐 report8.html；可按需改 CSS 变量微调配色
+ * ============================================================ */
+:root{
+  --cyan:#00e7ff; --blue:#1890ff; --green:#00f2a9; --orange:#ffaa00;
+  --red:#ff4d4f; --purple:#a855f7; --text:#e6f7ff; --dim:#8fb0c7;
+  --bg:#020b1e; --panel:rgba(8,28,56,.72); --border:rgba(0,231,255,.30);
+  --grid:rgba(0,231,255,.12);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;overflow:hidden;font-family:"Microsoft YaHei","PingFang SC",sans-serif;background:var(--bg);color:var(--text)}
+body{background:radial-gradient(ellipse at 30% 40%,#0a2a5a 0%,#020b1e 70%);position:relative}
+body::before{content:"";position:absolute;inset:0;background-image:
+  radial-gradient(circle at 20% 30%,rgba(0,231,255,.04) 0%,transparent 50%),
+  radial-gradient(circle at 80% 70%,rgba(24,144,255,.06) 0%,transparent 50%),
+  linear-gradient(rgba(0,231,255,.03) 1px,transparent 1px),
+  linear-gradient(90deg,rgba(0,231,255,.03) 1px,transparent 1px);
+  background-size:100% 100%,100% 100%,40px 40px,40px 40px;pointer-events:none;z-index:0}
+
+.app{position:relative;z-index:2;display:flex;flex-direction:column;height:100%;padding:0 .6vw .4vh}
+
+/* ===== 顶部栏 ===== */
+.topbar{height:7vh;min-height:58px;display:flex;align-items:center;justify-content:space-between;
+  background:linear-gradient(90deg,rgba(0,40,80,.35),rgba(0,80,160,.18),rgba(0,40,80,.35));
+  border:1px solid rgba(0,150,255,.20);border-radius:12px;box-shadow:0 0 30px rgba(0,100,200,.08);
+  backdrop-filter:blur(6px);padding:0 1.2vw;position:relative;flex-shrink:0;margin-bottom:.5vh}
+.topbar::after{content:"";position:absolute;bottom:-1px;left:10%;width:80%;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(0,180,255,.5),transparent)}
+.weather-summary{width:18%;font-size:13px;line-height:1.5;color:#fff}
+.weather-summary strong{font-size:18px}
+.brand{text-align:center;width:36%;min-width:280px}
+.brand small{font-size:11px;letter-spacing:3px;color:var(--cyan);display:block}
+.brand h1{font-size:clamp(16px,1.5vw,26px);letter-spacing:4px;margin-top:2px;
+  text-shadow:0 0 16px rgba(0,231,255,.8);background:linear-gradient(180deg,#fff,#00e7ff);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.topright{width:42%;display:flex;align-items:center;justify-content:flex-end;gap:.6vw;flex-wrap:wrap}
+.duty-info{flex:0 1 180px;min-width:120px;text-align:center;font-size:12px;line-height:1.5}
+.duty-info a{display:block;color:#fff;text-decoration:none;border-bottom:1px dashed rgba(0,231,255,.45);padding:2px 0}
+.clock{text-align:right;font-variant-numeric:tabular-nums}
+.clock .t{font-size:clamp(16px,1.3vw,24px);font-weight:300;letter-spacing:1px;color:#b0daff}
+.clock .d{font-size:11px;color:var(--dim)}
+.nav{display:flex;gap:6px;background:rgba(0,20,50,.6);border-radius:20px;padding:3px;border:1px solid rgba(0,150,255,.15)}
+.nav-btn{border:none;background:transparent;color:#7aabcc;font-size:13px;padding:5px 14px;border-radius:16px;
+  cursor:pointer;transition:all .3s;letter-spacing:1px;font-family:inherit;text-decoration:none;display:inline-block}
+.nav-btn:hover{color:#b0daff;background:rgba(0,80,160,.25)}
+.nav-btn.active{background:rgba(0,150,255,.28);color:#fff;box-shadow:0 0 18px rgba(0,150,255,.2)}
+.nav-btn.nav-stop{color:#ffd9a3;border:1px solid rgba(255,170,0,.45);background:rgba(255,120,0,.12);font-weight:600}
+
+/* 文案工具条 */
+.edit-toolbar{display:flex;gap:6px;align-items:center}
+.edit-toolbar .layui-btn{height:28px;line-height:28px;padding:0 10px;font-size:12px;background:rgba(0,231,255,.12);border:1px solid var(--border);color:var(--cyan)}
+.edit-toolbar .layui-btn:hover{background:rgba(0,231,255,.25)}
+.edit-hint{font-size:11px;color:var(--dim);white-space:nowrap}
+
+/* ===== 主体九宫格 ===== */
+.stage{flex:1;min-height:0;position:relative}
+.grid33{display:grid;grid-template-columns:1fr 1.2fr 1fr;grid-template-rows:1fr 1fr 1fr;gap:.55vw;height:100%;min-height:0}
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:.7vh .65vw;
+  position:relative;backdrop-filter:blur(6px);box-shadow:0 0 20px rgba(0,231,255,.06) inset;
+  display:flex;flex-direction:column;min-height:0;overflow:hidden;cursor:default;transition:border-color .3s}
+.panel.clickable{cursor:pointer}
+.panel.clickable:hover{border-color:rgba(0,231,255,.65);box-shadow:0 0 24px rgba(0,231,255,.15) inset}
+.panel::before,.panel::after{content:"";position:absolute;width:12px;height:12px;border-color:var(--cyan);border-style:solid;opacity:.7}
+.panel::before{top:-1px;left:-1px;border-width:2px 0 0 2px}
+.panel::after{bottom:-1px;right:-1px;border-width:0 2px 2px 0}
+.panel-title{font-size:clamp(12px,.95vw,16px);font-weight:600;color:var(--cyan);padding-left:.7vw;
+  margin-bottom:.4vh;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;position:relative}
+.panel-title::before{content:"";position:absolute;left:0;top:50%;transform:translateY(-50%);width:4px;height:70%;
+  background:linear-gradient(180deg,var(--cyan),var(--blue));border-radius:2px}
+.panel-title .tag{font-size:11px;color:var(--dim);border:1px solid var(--border);padding:1px 8px;border-radius:10px;font-weight:400}
+.panel-body{flex:1;min-height:0;position:relative;overflow:hidden}
+
+/* KPI / 数字块 */
+.kpi-hero{display:flex;align-items:center;justify-content:center;gap:12px;padding:.4vh 0;margin-bottom:.3vh;
+  background:linear-gradient(90deg,rgba(0,231,255,.04),rgba(24,144,255,.08),rgba(0,231,255,.04));
+  border:1px solid var(--border);border-radius:8px}
+.kpi-hero label{font-size:12px;color:var(--dim)}
+.kpi-hero strong{font-size:clamp(22px,2vw,36px);color:#fff;text-shadow:0 0 18px rgba(0,231,255,.6)}
+.kpi-hero small{font-size:10px;color:var(--cyan);letter-spacing:1px}
+.kpi-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.35vw}
+.kpi-grid .kpi{background:rgba(0,231,255,.06);border:1px solid var(--border);border-radius:8px;text-align:center;padding:.5vh 0}
+.kpi-grid .kpi b{display:block;font-size:clamp(16px,1.3vw,24px);font-weight:700;color:var(--cyan);text-shadow:0 0 10px rgba(0,231,255,.4)}
+.kpi-grid .kpi span{font-size:11px;color:var(--dim)}
+.kpi-grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:.35vw}
+.kpi-grid4 .kpi{background:rgba(0,231,255,.06);border:1px solid var(--border);border-radius:8px;text-align:center;padding:.5vh 0}
+.kpi-grid4 .kpi b{display:block;font-size:clamp(14px,1.1vw,22px);font-weight:700;color:var(--cyan)}
+.kpi-grid4 .kpi span{font-size:10px;color:var(--dim)}
+
+/* 设施设备数字卡 */
+.fac-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.35vw .3vw;height:100%;align-content:start}
+.fac-card{background:rgba(255,255,255,.03);border:1px solid rgba(0,231,255,.15);border-radius:6px;padding:.45vh .3vw;text-align:center}
+.fac-card .n{font-size:clamp(16px,1.4vw,24px);font-weight:700;color:var(--cyan)}
+.fac-card .n.warn{color:var(--orange)}
+.fac-card .n.bad{color:var(--red)}
+.fac-card .l{font-size:10px;color:var(--dim);margin-top:2px}
+.fac-card .s{font-size:10px;margin-top:2px}
+.fac-card .s.ok{color:var(--green)}
+.fac-card .s.warn{color:var(--orange)}
+
+/* 表格 */
+.table-scroll{flex:1;min-height:0;overflow:auto}
+.tbl{width:100%;font-size:clamp(11px,.8vw,13px);border-collapse:separate;border-spacing:0}
+.tbl thead th{position:sticky;top:0;z-index:2;background:#08213d;color:var(--cyan);font-weight:500;
+  border-bottom:1px solid var(--border);padding:.35vh .25vw;font-size:11px;text-align:center;white-space:nowrap}
+.tbl tbody td{padding:.4vh .25vw;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-bottom:1px solid rgba(0,231,255,.05)}
+.tbl tbody tr:hover{background:rgba(0,231,255,.08);cursor:pointer}
+.lvl-紧急{color:var(--red)}.lvl-预警{color:var(--orange)}.lvl-一般{color:var(--blue)}
+
+/* 气象 */
+.weather-main{display:flex;align-items:center;justify-content:space-around;padding:.3vh 0}
+.weather-icon{font-size:clamp(36px,3.5vw,56px);text-shadow:0 0 20px rgba(0,231,255,.5)}
+.weather-info .temp{font-size:clamp(22px,2vw,34px);font-weight:700;color:var(--cyan)}
+.weather-info .desc{font-size:13px;color:var(--dim)}
+.weather-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.35vh;margin-top:.3vh}
+.weather-item{background:rgba(255,255,255,.03);border-radius:6px;padding:.35vh .25vw;text-align:center}
+.weather-item .w-val{font-size:clamp(12px,.95vw,16px);color:var(--cyan);font-weight:600}
+.weather-item .w-val.wind-yellow{color:var(--orange)!important;text-shadow:0 0 8px rgba(255,170,0,.5)}
+.weather-item .w-val.wind-red{color:var(--red)!important;text-shadow:0 0 8px rgba(255,77,79,.6)}
+.weather-item .w-label{font-size:10px;color:var(--dim)}
+
+/* 告警列表 */
+.alarm-list{list-style:none;overflow-y:auto;height:100%;padding-right:3px}
+.alarm-list li{display:flex;align-items:center;gap:8px;padding:.4vh .4vw;margin-bottom:.35vh;
+  background:rgba(255,255,255,.03);border-left:3px solid var(--orange);border-radius:0 6px 6px 0;font-size:12px}
+.alarm-list li.level-1{border-left-color:var(--red);animation:pulseRed 1.8s infinite}
+.alarm-list li.level-2{border-left-color:var(--orange)}
+.alarm-list li.level-3{border-left-color:var(--blue)}
+@keyframes pulseRed{0%,100%{background:rgba(255,77,79,.06)}50%{background:rgba(255,77,79,.18)}}
+.alarm-time{color:var(--dim);margin-left:auto;white-space:nowrap;font-size:11px}
+
+/* 安检排队 */
+.queue-list{display:flex;flex-direction:column;gap:.4vh;height:100%}
+.queue-item{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.03);border-radius:6px;padding:.4vh .5vw}
+.queue-item .qn{width:72px;font-size:12px}
+.queue-item .bar{flex:1;height:8px;background:rgba(0,231,255,.1);border-radius:4px;overflow:hidden}
+.queue-item .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--cyan),var(--blue));border-radius:4px}
+.queue-item .bar.busy i{background:linear-gradient(90deg,var(--orange),var(--red))}
+.queue-item .qv{font-size:12px;color:var(--cyan);min-width:70px;text-align:right}
+.queue-note{font-size:11px;color:var(--dim);margin-top:auto;padding-top:.3vh}
+
+/* STOP */
+.stop-stats{display:grid;grid-template-columns:1fr 1fr;gap:.4vw;margin-bottom:.4vh}
+.stop-stats .kpi{background:rgba(255,170,0,.08);border:1px solid rgba(255,170,0,.35);border-radius:8px;text-align:center;padding:.6vh 0}
+.stop-stats .kpi b{display:block;font-size:clamp(18px,1.5vw,28px);color:var(--orange)}
+.stop-stats .kpi span{font-size:11px;color:var(--dim)}
+.stop-link{display:block;text-align:center;margin-top:.3vh;font-size:12px;color:var(--cyan);text-decoration:underline}
+
+/* 底部跑马灯 */
+.marquee{height:3vh;min-height:26px;flex-shrink:0;margin-top:.4vh;background:rgba(0,231,255,.05);
+  border-top:1px solid rgba(0,231,255,.15);border-radius:4px;display:flex;align-items:center;overflow:hidden}
+.marquee-content{white-space:nowrap;animation:marquee 40s linear infinite;color:var(--orange);font-size:13px;padding-left:100%}
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-100%)}}
+
+/* ===== 可编辑文案 ===== */
+.ed{cursor:text;border-bottom:1px dashed transparent;transition:border-color .2s,background .2s;outline:none}
+.ed:hover{border-bottom-color:rgba(0,231,255,.45);background:rgba(0,231,255,.06)}
+.ed[contenteditable="true"]{border-bottom-color:var(--cyan);background:rgba(0,231,255,.12);box-shadow:0 0 0 1px rgba(0,231,255,.3)}
+
+/* ===== Layui layer 深色皮肤 ===== */
+.dept-skin{background:rgba(4,18,40,.92)!important;backdrop-filter:blur(8px);border:1px solid rgba(0,231,255,.5)!important;
+  border-radius:12px!important;box-shadow:0 0 40px rgba(0,231,255,.25);color:var(--text)}
+.dept-skin .layui-layer-title{background:transparent!important;border-bottom:1px solid rgba(0,231,255,.3)!important;
+  color:var(--cyan)!important;font-size:16px;letter-spacing:1px}
+.dept-skin .layui-layer-setwin .layui-layer-close1{background-position:1px -40px;filter:brightness(2)}
+.dept-skin .layui-layer-content{color:var(--text)!important}
+
+/* 弹窗内部通用 */
+.modal-box{padding:12px 16px;max-height:calc(90vh - 60px);overflow:auto}
+.modal-box h4{font-size:13px;color:var(--cyan);margin:8px 0;border-left:3px solid var(--cyan);padding-left:8px}
+.leader-card{display:flex;align-items:center;gap:12px;background:rgba(0,231,255,.08);
+  border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin-bottom:10px}
+.leader-card .avatar{width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,#00e7ff,#1890ff);
+  display:flex;align-items:center;justify-content:center;font-size:20px;color:#021;flex-shrink:0}
+.leader-card .info b{font-size:16px;color:#fff}
+.leader-card .info div{font-size:12px;color:var(--dim);margin-top:2px}
+.team-block{margin-bottom:12px;background:rgba(255,255,255,.02);border:1px solid rgba(0,231,255,.12);border-radius:8px;padding:8px 10px}
+.team-block .team-name{font-size:14px;color:#fff;margin-bottom:6px}
+.staff-row{display:flex;align-items:center;gap:8px;padding:5px 8px;margin-bottom:4px;background:rgba(255,255,255,.03);border-radius:4px;font-size:12px}
+.staff-row .nm{width:70px;color:#fff}.staff-row .rl{width:90px;color:var(--green)}.staff-row .sh{flex:1;color:var(--dim)}
+.staff-row .st{width:50px;text-align:right}.staff-row .st.on{color:var(--green)}.staff-row .st.off{color:var(--dim)}
+.dept-tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.dept-tabs span{padding:4px 12px;border-radius:14px;font-size:12px;color:var(--dim);border:1px solid var(--border);cursor:pointer}
+.dept-tabs span.active{background:rgba(0,231,255,.15);border-color:rgba(0,231,255,.5);color:var(--cyan)}
+.search-bar{display:flex;gap:8px;margin-bottom:10px;align-items:center}
+.search-bar input{flex:1;background:rgba(0,20,50,.6);border:1px solid var(--border);color:#fff;border-radius:4px;padding:6px 10px;font-size:13px}
+.search-bar input:focus{outline:none;border-color:var(--cyan)}
+
+/* ===== 航班页 ===== */
+.flight-page .stage{display:flex;flex-direction:column;gap:.5vh}
+.flight-tabs{display:flex;gap:8px;margin-bottom:.3vh}
+.flight-tabs .ftab{padding:6px 18px;border-radius:16px;font-size:13px;color:var(--dim);border:1px solid var(--border);
+  background:rgba(0,20,50,.5);cursor:pointer}
+.flight-tabs .ftab.active{background:rgba(0,231,255,.18);border-color:rgba(0,231,255,.5);color:var(--cyan)}
+.flight-panel{flex:1;min-height:0;display:none;flex-direction:column}
+.flight-panel.active{display:flex}
+
+/* 航班表格行底色（对照协同共享平台截图） */
+.row-blue{background:rgba(24,144,255,.28)!important}
+.row-green{background:rgba(0,242,169,.22)!important}
+.row-cyan{background:rgba(0,231,255,.12)!important}
+.row-orange{background:rgba(255,170,0,.22)!important}
+.row-red{background:rgba(255,77,79,.2)!important}
+.row-gray{background:rgba(143,176,199,.08)!important}
+.vip-star{color:var(--orange);margin-left:4px}
+
+/* 甘特图 */
+.gantt-wrap{flex:1;min-height:0;overflow:auto;position:relative}
+.gantt-table{border-collapse:collapse;width:max-content;min-width:100%;font-size:12px}
+.gantt-table th,.gantt-table td{border:1px solid rgba(0,231,255,.12);padding:0;height:36px;position:relative}
+.gantt-table th{background:#08213d;color:var(--cyan);font-weight:500;text-align:center;position:sticky;top:0;z-index:3}
+.gantt-table .stand-col{position:sticky;left:0;z-index:4;background:#061830;color:#fff;width:70px;min-width:70px;text-align:center;font-size:12px}
+.gantt-table thead .stand-col{z-index:5}
+.gantt-bar{position:absolute;top:6px;height:24px;border-radius:4px;font-size:11px;line-height:24px;padding:0 6px;
+  color:#fff;overflow:hidden;white-space:nowrap;cursor:pointer;box-shadow:0 0 8px rgba(0,0,0,.3)}
+.gantt-now{position:absolute;top:0;bottom:0;width:2px;background:var(--cyan);z-index:2;pointer-events:none;box-shadow:0 0 8px var(--cyan)}
+.legend{display:flex;flex-wrap:wrap;gap:10px;padding:.3vh 0;font-size:11px;color:var(--dim)}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:2px;margin-right:4px;vertical-align:middle}
+
+.chart-box{width:100%;height:100%;min-height:80px}
+
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+::-webkit-scrollbar-track{background:transparent}
+
+@media(max-width:1100px){
+  .grid33{grid-template-columns:1fr;grid-template-rows:none;overflow:auto}
+  .panel{min-height:220px}
+  html,body{overflow:auto;height:auto}
+  .app{height:auto;min-height:100vh}
+}

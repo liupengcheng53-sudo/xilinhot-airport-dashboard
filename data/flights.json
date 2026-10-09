@@ -1,0 +1,373 @@
+{
+  "meta": {
+    "date": "2026-10-09",
+    "airport": "XIL",
+    "total": 16,
+    "arrivals": 8,
+    "departures": 8,
+    "note": "表格与机位甘特共用本文件；stands[].occupancy 关联 flightId"
+  },
+  "statusColors": {
+    "arrived": {"bg": "rgba(24,144,255,.35)", "label": "已到达", "rowClass": "row-blue"},
+    "boarding": {"bg": "rgba(0,242,169,.28)", "label": "登机中", "rowClass": "row-green"},
+    "departed": {"bg": "rgba(0,231,255,.18)", "label": "已起飞", "rowClass": "row-cyan"},
+    "delayed": {"bg": "rgba(255,170,0,.30)", "label": "延误", "rowClass": "row-orange"},
+    "cancelled": {"bg": "rgba(255,77,79,.25)", "label": "取消", "rowClass": "row-red"},
+    "planned": {"bg": "rgba(143,176,199,.15)", "label": "计划", "rowClass": "row-gray"},
+    "onblock": {"bg": "rgba(24,144,255,.45)", "label": "在位保障", "rowClass": "row-blue"}
+  },
+  "ganttBarColors": {
+    "arrived": "#1890ff",
+    "boarding": "#00f2a9",
+    "departed": "#5b8cff",
+    "delayed": "#ffaa00",
+    "cancelled": "#ff4d4f",
+    "planned": "#6b7c93",
+    "onblock": "#1890ff"
+  },
+  "flights": [
+    {
+      "id": "F01",
+      "date": "10-09",
+      "gate": "01",
+      "flightIn": "CA8177",
+      "flightOut": "CA8178",
+      "aircraftType": "B737",
+      "reg": "B-1234",
+      "standId": "08",
+      "status": "onblock",
+      "statusText": "在位保障",
+      "sta": "2026-10-09T08:20:00",
+      "ata": "2026-10-09T08:15:00",
+      "std": "2026-10-09T09:40:00",
+      "atd": null,
+      "tobt": "2026-10-09T09:25:00",
+      "cobt": "2026-10-09T09:30:00",
+      "routeIn": "北京首都→锡林浩特",
+      "routeOut": "锡林浩特→北京首都",
+      "vip": false
+    },
+    {
+      "id": "F02",
+      "date": "10-09",
+      "gate": "02",
+      "flightIn": "GS6693",
+      "flightOut": "GS6694",
+      "aircraftType": "E190",
+      "reg": "B-5678",
+      "standId": "03",
+      "status": "boarding",
+      "statusText": "登机中",
+      "sta": "2026-10-09T10:05:00",
+      "ata": "2026-10-09T10:02:00",
+      "std": "2026-10-09T11:20:00",
+      "atd": null,
+      "tobt": "2026-10-09T11:05:00",
+      "cobt": "2026-10-09T11:10:00",
+      "routeIn": "呼和浩特→锡林浩特",
+      "routeOut": "锡林浩特→呼和浩特",
+      "vip": true
+    },
+    {
+      "id": "F03",
+      "date": "10-09",
+      "gate": "03",
+      "flightIn": "9D5693",
+      "flightOut": "9D5694",
+      "aircraftType": "CRJ900",
+      "reg": "B-3366",
+      "standId": "01",
+      "status": "arrived",
+      "statusText": "已到达",
+      "sta": "2026-10-09T11:40:00",
+      "ata": "2026-10-09T11:45:00",
+      "std": "2026-10-09T13:00:00",
+      "atd": null,
+      "tobt": "2026-10-09T12:45:00",
+      "cobt": "2026-10-09T12:50:00",
+      "routeIn": "通辽→锡林浩特",
+      "routeOut": "锡林浩特→通辽",
+      "vip": false
+    },
+    {
+      "id": "F04",
+      "date": "10-09",
+      "gate": "04",
+      "flightIn": "G54459",
+      "flightOut": "G54460",
+      "aircraftType": "A320",
+      "reg": "B-8890",
+      "standId": "05",
+      "status": "delayed",
+      "statusText": "延误",
+      "sta": "2026-10-09T12:30:00",
+      "ata": null,
+      "std": "2026-10-09T14:00:00",
+      "atd": null,
+      "tobt": "2026-10-09T14:20:00",
+      "cobt": "2026-10-09T14:30:00",
+      "routeIn": "天津→锡林浩特",
+      "routeOut": "锡林浩特→天津",
+      "vip": false
+    },
+    {
+      "id": "F05",
+      "date": "10-09",
+      "gate": "05",
+      "flightIn": "HU7875",
+      "flightOut": "HU7876",
+      "aircraftType": "B737",
+      "reg": "B-1999",
+      "standId": "06",
+      "status": "planned",
+      "statusText": "计划",
+      "sta": "2026-10-09T14:50:00",
+      "ata": null,
+      "std": "2026-10-09T16:10:00",
+      "atd": null,
+      "tobt": "2026-10-09T15:55:00",
+      "cobt": "2026-10-09T16:00:00",
+      "routeIn": "海口→锡林浩特",
+      "routeOut": "锡林浩特→海口",
+      "vip": false
+    },
+    {
+      "id": "F06",
+      "date": "10-09",
+      "gate": "06",
+      "flightIn": "MU5240",
+      "flightOut": "MU5241",
+      "aircraftType": "A320",
+      "reg": "B-6001",
+      "standId": "02",
+      "status": "departed",
+      "statusText": "已起飞",
+      "sta": "2026-10-09T07:10:00",
+      "ata": "2026-10-09T07:05:00",
+      "std": "2026-10-09T08:30:00",
+      "atd": "2026-10-09T08:28:00",
+      "tobt": "2026-10-09T08:15:00",
+      "cobt": "2026-10-09T08:20:00",
+      "routeIn": "上海虹桥→锡林浩特",
+      "routeOut": "锡林浩特→上海虹桥",
+      "vip": false
+    },
+    {
+      "id": "F07",
+      "date": "10-09",
+      "gate": "07",
+      "flightIn": "CZ6450",
+      "flightOut": "CZ6451",
+      "aircraftType": "B737",
+      "reg": "B-7721",
+      "standId": "04",
+      "status": "boarding",
+      "statusText": "登机中",
+      "sta": "2026-10-09T13:15:00",
+      "ata": "2026-10-09T13:10:00",
+      "std": "2026-10-09T14:40:00",
+      "atd": null,
+      "tobt": "2026-10-09T14:25:00",
+      "cobt": "2026-10-09T14:30:00",
+      "routeIn": "广州→锡林浩特",
+      "routeOut": "锡林浩特→广州",
+      "vip": false
+    },
+    {
+      "id": "F08",
+      "date": "10-09",
+      "gate": "08",
+      "flightIn": "3U8882",
+      "flightOut": "3U8883",
+      "aircraftType": "A319",
+      "reg": "B-3011",
+      "standId": "07",
+      "status": "planned",
+      "statusText": "计划",
+      "sta": "2026-10-09T15:30:00",
+      "ata": null,
+      "std": "2026-10-09T16:50:00",
+      "atd": null,
+      "tobt": "2026-10-09T16:35:00",
+      "cobt": "2026-10-09T16:40:00",
+      "routeIn": "成都→锡林浩特",
+      "routeOut": "锡林浩特→成都",
+      "vip": false
+    },
+    {
+      "id": "F09",
+      "date": "10-09",
+      "gate": "01",
+      "flightIn": "DR6532",
+      "flightOut": "DR6533",
+      "aircraftType": "B737",
+      "reg": "B-1555",
+      "standId": "09",
+      "status": "arrived",
+      "statusText": "已到达",
+      "sta": "2026-10-09T09:50:00",
+      "ata": "2026-10-09T09:48:00",
+      "std": "2026-10-09T11:10:00",
+      "atd": null,
+      "tobt": "2026-10-09T10:55:00",
+      "cobt": "2026-10-09T11:00:00",
+      "routeIn": "昆明→锡林浩特",
+      "routeOut": "锡林浩特→昆明",
+      "vip": false
+    },
+    {
+      "id": "F10",
+      "date": "10-09",
+      "gate": "02",
+      "flightIn": "BK2788",
+      "flightOut": "BK2789",
+      "aircraftType": "E190",
+      "reg": "B-3210",
+      "standId": "10",
+      "status": "delayed",
+      "statusText": "延误",
+      "sta": "2026-10-09T16:20:00",
+      "ata": null,
+      "std": "2026-10-09T17:40:00",
+      "atd": null,
+      "tobt": "2026-10-09T18:00:00",
+      "cobt": "2026-10-09T18:10:00",
+      "routeIn": "天津→锡林浩特",
+      "routeOut": "锡林浩特→天津",
+      "vip": false
+    },
+    {
+      "id": "F11",
+      "date": "10-09",
+      "gate": "03",
+      "flightIn": "FU6671",
+      "flightOut": "FU6672",
+      "aircraftType": "B737",
+      "reg": "B-7888",
+      "standId": "11",
+      "status": "planned",
+      "statusText": "计划",
+      "sta": "2026-10-09T17:00:00",
+      "ata": null,
+      "std": "2026-10-09T18:20:00",
+      "atd": null,
+      "tobt": "2026-10-09T18:05:00",
+      "cobt": "2026-10-09T18:10:00",
+      "routeIn": "福州→锡林浩特",
+      "routeOut": "锡林浩特→福州",
+      "vip": false
+    },
+    {
+      "id": "F12",
+      "date": "10-09",
+      "gate": "04",
+      "flightIn": "SC4821",
+      "flightOut": "SC4822",
+      "aircraftType": "B737",
+      "reg": "B-5666",
+      "standId": "12",
+      "status": "departed",
+      "statusText": "已起飞",
+      "sta": "2026-10-09T06:40:00",
+      "ata": "2026-10-09T06:35:00",
+      "std": "2026-10-09T07:55:00",
+      "atd": "2026-10-09T07:52:00",
+      "tobt": "2026-10-09T07:40:00",
+      "cobt": "2026-10-09T07:45:00",
+      "routeIn": "济南→锡林浩特",
+      "routeOut": "锡林浩特→济南",
+      "vip": false
+    }
+  ],
+  "stands": [
+    {
+      "id": "01", "name": "01(C)", "disabled": false,
+      "occupancy": [
+        {"flightId": "F03", "start": "2026-10-09T11:45:00", "end": "2026-10-09T13:00:00", "label": "9D5693/5694"}
+      ]
+    },
+    {
+      "id": "02", "name": "02(C)", "disabled": false,
+      "occupancy": [
+        {"flightId": "F06", "start": "2026-10-09T07:05:00", "end": "2026-10-09T08:28:00", "label": "MU5240/5241"}
+      ]
+    },
+    {
+      "id": "03", "name": "03(C)", "disabled": false,
+      "occupancy": [
+        {"flightId": "F02", "start": "2026-10-09T10:02:00", "end": "2026-10-09T11:20:00", "label": "GS6693/6694"}
+      ]
+    },
+    {
+      "id": "04", "name": "04(C)", "disabled": false,
+      "occupancy": [
+        {"flightId": "F07", "start": "2026-10-09T13:10:00", "end": "2026-10-09T14:40:00", "label": "CZ6450/6451"}
+      ]
+    },
+    {
+      "id": "05", "name": "05(C)", "disabled": false,
+      "occupancy": [
+        {"flightId": "F04", "start": "2026-10-09T13:10:00", "end": "2026-10-09T14:30:00", "label": "G54459/460"}
+      ]
+    },
+    {
+      "id": "06", "name": "06(C)", "disabled": false,
+      "occupancy": [
+        {"flightId": "F05", "start": "2026-10-09T14:50:00", "end": "2026-10-09T16:10:00", "label": "HU7875/7876"}
+      ]
+    },
+    {
+      "id": "07", "name": "07(C)", "disabled": false,
+      "occupancy": [
+        {"flightId": "F08", "start": "2026-10-09T15:30:00", "end": "2026-10-09T16:50:00", "label": "3U8882/8883"}
+      ]
+    },
+    {
+      "id": "08", "name": "08(C)", "disabled": false,
+      "occupancy": [
+        {"flightId": "F01", "start": "2026-10-09T08:15:00", "end": "2026-10-09T09:40:00", "label": "CA8177/8178"}
+      ]
+    },
+    {
+      "id": "09", "name": "09(C)", "disabled": false,
+      "occupancy": [
+        {"flightId": "F09", "start": "2026-10-09T09:48:00", "end": "2026-10-09T11:10:00", "label": "DR6532/6533"}
+      ]
+    },
+    {
+      "id": "10", "name": "10(C)", "disabled": false,
+      "occupancy": [
+        {"flightId": "F10", "start": "2026-10-09T16:40:00", "end": "2026-10-09T18:10:00", "label": "BK2788/2789"}
+      ]
+    },
+    {
+      "id": "11", "name": "11(C)", "disabled": false,
+      "occupancy": [
+        {"flightId": "F11", "start": "2026-10-09T17:00:00", "end": "2026-10-09T18:20:00", "label": "FU6671/6672"}
+      ]
+    },
+    {
+      "id": "12", "name": "12(C)", "disabled": false,
+      "occupancy": [
+        {"flightId": "F12", "start": "2026-10-09T06:35:00", "end": "2026-10-09T07:52:00", "label": "SC4821/4822"}
+      ]
+    },
+    {
+      "id": "13", "name": "13(C)", "disabled": true,
+      "occupancy": []
+    }
+  ],
+  "homeSummary": {
+    "totalToday": 54,
+    "ontimeRate": "94.2%",
+    "delayed": 4,
+    "cancelled": 0,
+    "avgDelayMin": 18,
+    "nextFlights": [
+      {"code": "CA8178", "dir": "出港", "time": "09:40", "status": "在位保障"},
+      {"code": "GS6694", "dir": "出港", "time": "11:20", "status": "登机中"},
+      {"code": "G54459", "dir": "进港", "time": "12:30", "status": "延误"},
+      {"code": "CZ6451", "dir": "出港", "time": "14:40", "status": "登机中"}
+    ]
+  }
+}
