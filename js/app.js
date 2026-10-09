@@ -371,35 +371,65 @@
 
   function openStopModal() {
     var s = DATA.stop || {};
-    // 优先打开本地 stop.html（登录+API，无嵌套远端双滚动条）；远端地址仅作「新窗口」备用
     var localUrl = s.localUrl || 'stop.html';
-    var remoteUrl = s.url || '';
+    var remoteUrl = s.url || 'http://111.56.250.18:9001/#/global';
+    // 弹窗先展示本地 mock 摘要（原 STOP 弹窗内容）；登录页用新窗口，避免 iframe 嵌套登录锁号 / 无权访问
+    var html = '<div class="modal-box stop-modal">';
+    html += '<p class="stop-modal-note">' + (s.mockNote || '以下为本地 mock 态势摘要；完整 STOP 请用下方按钮打开。') + '</p>';
+    html += '<div class="stop-stats stop-modal-stats">';
+    html += '<div class="kpi"><b>' + (s.onlinePeople != null ? s.onlinePeople : '--') + '</b><span>在线人数</span></div>';
+    html += '<div class="kpi"><b>' + (s.onlineDevices != null ? s.onlineDevices : '--') + '</b><span>在线设备</span></div>';
+    html += '<div class="kpi"><b>' + (s.coverage || '--') + '</b><span>定位覆盖</span></div>';
+    html += '<div class="kpi"><b style="color:#ffaa00">' + (s.alarms != null ? s.alarms : '--') + '</b><span>异常事件</span></div>';
+    html += '</div>';
+    html += '<table class="tbl"><thead><tr><th>设备</th><th>在线</th><th>总量</th></tr></thead><tbody>';
+    (s.devices || []).forEach(function (d) {
+      html += '<tr><td>' + d.name + '</td><td>' + d.online + '</td><td>' + d.total + '</td></tr>';
+    });
+    if (!(s.devices && s.devices.length)) {
+      html += '<tr><td colspan="3">暂无设备 mock 数据</td></tr>';
+    }
+    html += '</tbody></table>';
+    html += '<div class="stop-modal-actions">';
+    html += '<button type="button" class="layui-btn layui-btn-normal layui-btn-sm" id="btnStopLocal">打开本地 STOP（stop.html）</button>';
+    html += '<button type="button" class="layui-btn layui-btn-sm" id="btnStopRemote">新窗口打开远端原站</button>';
+    html += '<button type="button" class="layui-btn layui-btn-primary layui-btn-sm" id="btnStopEmbed">弹层嵌入本地页</button>';
+    html += '</div>';
+    html += '<p class="stop-modal-tip">说明：浏览器直接打开远端原站可正常登录；大屏内嵌远端或嵌套登录易出现账号限制 / 无权访问 / AUTH_EXPIRED。推荐「新窗口原站」或本地 <code>npm start</code> 代理后的 stop.html。</p>';
+    html += '<p class="stop-modal-tip">远端链接：<a class="stop-link" href="' + remoteUrl + '" target="_blank" rel="noopener">' + remoteUrl + '</a></p>';
+    html += '</div>';
+
     layer.open({
-      type: 2,
-      title: Editable.get('modal_stop_title', 'STOP 监控预警'),
-      skin: 'dept-skin stop-skin',
-      area: ['94%', '92%'],
+      type: 1,
+      title: Editable.get('modal_stop_title', 'STOP 系统'),
+      skin: 'dept-skin',
+      area: ['820px', '85%'],
       shadeClose: true,
-      // type:2 直接 iframe 本地页；外层 overflow:hidden，由 stop.html 内部侧栏/主区滚动
-      content: localUrl,
-      success: function (layero) {
-        // 强制内容区与 iframe 铺满，去掉 layer 默认内边距导致的二次滚动
-        var content = layero.find('.layui-layer-content');
-        content.css({ overflow: 'hidden', padding: 0 });
-        var iframe = layero.find('iframe');
-        iframe.css({ width: '100%', height: '100%', border: 0, display: 'block' });
-        // 标题栏旁可选：新窗口打开远端（若配置了 url）
-        if (remoteUrl && !layero.find('.stop-remote-link').length) {
-          var tip = document.createElement('a');
-          tip.className = 'stop-remote-link';
-          tip.href = remoteUrl;
-          tip.target = '_blank';
-          tip.rel = 'noopener';
-          tip.textContent = '远端原站';
-          tip.title = remoteUrl;
-          tip.style.cssText = 'position:absolute;right:46px;top:12px;font-size:12px;color:#8fb0c7;z-index:10;text-decoration:underline';
-          layero[0].appendChild(tip);
-        }
+      content: html,
+      success: function () {
+        $('#btnStopLocal').on('click', function () {
+          // 同源代理路径，新窗口登录，避免弹窗内嵌套验证码/锁号
+          window.open(localUrl, '_blank', 'noopener');
+        });
+        $('#btnStopRemote').on('click', function () {
+          window.open(remoteUrl, '_blank', 'noopener');
+        });
+        $('#btnStopEmbed').on('click', function () {
+          // 可选：弹层嵌入本地 stop.html（仍走 /stop-*-api 代理）；远端勿嵌 iframe
+          layer.open({
+            type: 2,
+            title: Editable.get('modal_stop_embed_title', 'STOP 本地页'),
+            skin: 'dept-skin stop-skin',
+            area: ['94%', '92%'],
+            shadeClose: true,
+            content: localUrl,
+            success: function (layero) {
+              var content = layero.find('.layui-layer-content');
+              content.css({ overflow: 'hidden', padding: 0 });
+              layero.find('iframe').css({ width: '100%', height: '100%', border: 0, display: 'block' });
+            }
+          });
+        });
       }
     });
   }

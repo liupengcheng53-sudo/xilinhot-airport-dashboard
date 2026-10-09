@@ -120,6 +120,18 @@ const server = http.createServer((req, res) => {
   const u = new URL(req.url || '/', `http://${req.headers.host || 'localhost'}`);
   const hit = matchProxy(u.pathname);
   if (hit) {
+    // 浏览器预检：代理路径允许跨方法，避免误打到静态 404
+    if (req.method === 'OPTIONS') {
+      res.writeHead(204, {
+        'Access-Control-Allow-Origin': req.headers.origin || '*',
+        'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE,OPTIONS',
+        'Access-Control-Allow-Headers': req.headers['access-control-request-headers'] || 'Content-Type,Authorization',
+        'Access-Control-Allow-Credentials': 'true',
+        'Access-Control-Max-Age': '86400',
+      });
+      res.end();
+      return;
+    }
     console.log(`[proxy] ${req.method} ${u.pathname} -> ${hit.targetBase}${hit.rest}`);
     proxyRequest(req, res, hit.targetBase, hit.rest);
     return;
