@@ -9,21 +9,49 @@ https://github.com/liupengcheng53-sudo/xilinhot-airport-dashboard
 
 ## 如何本地打开
 
-### 方式一：静态服务器（推荐，避免部分浏览器限制 `fetch` 本地 JSON）
+### 方式一：带 STOP 代理的本地服务（推荐）
+
+`stop.html` 登录接口走同源路径 `/stop-base-api`（以及 `/stop-work-api`、`/stop-analysis`）。  
+原 demo 靠网关/反向代理转发到真实 STOP 后端；**裸 `npx serve` / `python -m http.server` 没有代理，登录会 404**。
+
+请用仓库自带代理脚本（零依赖 Node）：
 
 ```bash
-# 进入仓库目录后任选其一
+# 进入仓库目录后
+npm start
+# 等价：npm run proxy  或  node scripts/dev-proxy.mjs
+```
+
+浏览器打开：
+
+- 大屏：http://localhost:5173/
+- STOP：http://localhost:5173/stop.html
+
+代理映射（与原 `demo/stop2.html` 绝对地址一致）：
+
+| 本地路径 | 上游 |
+|---------|------|
+| `/stop-work-api` | `http://111.56.250.18:8081/api` |
+| `/stop-base-api` | `http://111.56.250.18:25100/api`（登录） |
+| `/stop-analysis` | `http://111.56.250.18:9528` |
+
+也可在 STOP 页「接口配置」或 `localStorage.stopBaseApi` 等直接填绝对地址（后端已对 localhost Origin 放行 CORS）。
+
+### 方式二：纯静态服务器（仅大屏 mock，STOP 登录会 404）
+
+```bash
 npx --yes serve -p 5173
 # 或
 python3 -m http.server 5173
 ```
 
-浏览器打开：http://localhost:5173/
+浏览器打开：http://localhost:5173/  
+适合只看九宫格 / 航班页；需要 STOP 登录请改用方式一。
 
-### 方式二：直接打开 HTML
+### 方式三：直接打开 HTML
 
 用浏览器打开 `index.html` / `flight.html`。  
-若 JSON 加载失败（`file://` 跨域限制），请改用方式一。
+若 JSON 加载失败（`file://` 跨域限制），请改用方式一或二。
 
 ## 页面说明
 
@@ -31,6 +59,7 @@ python3 -m http.server 5173
 |------|------|
 | `index.html` | 首屏 3×3 九宫格 |
 | `flight.html` | 航班表格 + 机位甘特（**同一份** `data/flights.json`） |
+| `stop.html` | STOP 监控预警（需 `npm start` 代理登录 API） |
 
 ### 九宫格
 

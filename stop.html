@@ -8,7 +8,12 @@
   STOP 监控预警本地页（从参考 demo/stop.html 适配）
   - 登录后 token 缓存在 localStorage（stopAuthToken / stopUser）
   - 接口默认走同源代理路径：/stop-work-api、/stop-base-api、/stop-analysis
-    本地联调时可在「接口配置」里改，或事先写入 localStorage.stopWorkApi 等
+    对应上游（与原 demo/stop2.html 一致）：
+      /stop-work-api  → http://111.56.250.18:8081/api
+      /stop-base-api  → http://111.56.250.18:25100/api   （登录）
+      /stop-analysis  → http://111.56.250.18:9528
+    本地请用 npm start / npm run proxy（scripts/dev-proxy.mjs），裸 serve 无代理会 404
+    也可在「接口配置」或 localStorage.stopWorkApi / stopBaseApi / stopAnalysisApi 写绝对地址
   - 本页设计为嵌入大屏 layer iframe：html/body overflow:hidden，仅侧栏/主区滚动
 -->
 

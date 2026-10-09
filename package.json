@@ -1,0 +1,10 @@
+{
+  "name": "xilinhot-airport-dashboard",
+  "private": true,
+  "description": "锡林浩特机场 AI 智能大数据大屏（领导演示原型）",
+  "scripts": {
+    "start": "node scripts/dev-proxy.mjs",
+    "proxy": "node scripts/dev-proxy.mjs",
+    "serve-static": "npx --yes serve -p 5173"
+  }
+}
